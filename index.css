@@ -1,0 +1,393 @@
+@font-face {
+    font-family: 'Belgiano'; /* nome que você vai usar no CSS */
+    src: url('../fonts/Belgiano.ttf') format('truetype'); /* caminho para o arquivo */
+    font-weight: normal;
+    font-style: normal;
+}
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Rubik", sans-serif;
+    font-style: Light 300;
+}
+html {
+  scroll-behavior: smooth;
+}
+body{
+   background: #c5f3c9;
+}
+a{
+  text-decoration: none;
+  color: black;
+}
+
+.logo{
+    font-family: Belgiano, sans-serif;
+    font-size: 2em;
+    margin-left: 60px;
+}
+.navbar, footer{
+    color: black;
+    background: #FBFBFF;    
+}
+.navbar{
+    width: 100%;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: bold;
+}
+.navbar span{
+    display: flex;
+    gap: 100px;
+    margin: 0 50px;
+}
+.navbar .login, .navbar .register{
+    display: flex;
+}
+.navbar img{
+    width: 20px;
+    margin-right: 5px;
+}
+.sugestoes h1{
+    margin: 5% 0;
+    text-align: center;
+}
+.sugestoes-cards{
+    display: flex;
+    width: 90%;
+    margin: auto;
+} 
+
+/* Container principal*/
+.main-container{
+    width: 100%;
+    height: 100vh;
+}
+.main-text{
+  color: white;
+}
+.main-content{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+}
+
+.main-form{
+    color: white;
+    position: relative;
+    width: 25%;
+    height: 550px;
+    background: #ffffff3a;
+    text-align: start;
+    border-radius: 10px;
+}
+.main-form h1{
+  margin-top: -100px;
+  margin-bottom: 40px;
+}
+.main-form form{
+  position: relative;
+  top: 25%;
+  display: flex;
+  flex-direction: column;
+  left: 15%;
+}
+.main-form form label{
+    padding: 8px;
+}
+.main-form form input{
+  width: 250px;
+  height: 40px;
+  border-radius: 20px;
+  border: none;
+  font-size: .9em;
+  padding: 5px;
+}
+.main-form form a{
+  margin-top: 10px;
+  font-size: .8em;
+}
+.main-form form button{
+  width: 250px;
+  height: 45px;
+  border-radius: 25px;
+  margin-top: 15px;
+  margin-left: 2%;
+  transition: .5s;
+}
+.main-form form button:hover{
+  background: #dfdfdf;
+}
+.main-form form span p{
+  margin-top: 4%;
+  margin-left: 18%;
+  font-size: .8em;
+}
+.form-text{
+  text-align: center;
+  position: relative;
+  top: 28%;
+}
+.main-effect{
+  backdrop-filter:brightness(40%);
+}
+.main-2, .main-3, .main-4{
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+}
+.main-2 span, .main-3 span, .main-4 span{
+  position: relative;
+  top: 27%;
+}
+.main-2 span h1, .main-3 span h1, .main-4 span h1{
+  font-size: 3em;
+}
+.main-2 span p, .main-3 span p .main-4 span p{
+  font-size: 1.2em;
+}
+.main-1{
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+  url("/src/noronha.jpg");
+  height: 100vh;
+  background-size: cover;
+}
+.main-2, .main-3, .main-4{
+  display: flex;
+}
+
+.main-2{
+  color: #59a55f;
+  flex-direction: row;
+}
+
+.main-3{
+  background: #b8dcee;
+  color: #436677;
+  flex-direction: row-reverse;
+}
+
+.main-4{
+  background: #a2d6d2;
+  color: #4d6866;
+  flex-direction: row;
+}
+
+.main-2 img,.main-3 img,.main-4 img{
+  position: relative;
+  object-fit: cover;
+  filter: brightness(80%);
+  width: 47%;
+  height: 100%;
+}
+.main-4 img{
+  height: 98.6%;
+  
+}
+.main-conteinar-text-2, .main-conteinar-text-3, .main-conteinar-text-4{
+  position: absolute;
+}
+.main-conteinar-text-2{
+  color: #2f5e33;
+  font-size: 3.5em;
+  left:57%;
+  top: 135%;
+}
+
+.main-conteinar-text-3 { 
+  color: #2b4653;
+  left: 10%;
+  top: 230%;
+}
+.main-conteinar-text-4 { 
+  color: #344948;
+  right: 6%;
+  top: 335%;
+}
+
+.main-conteinar-text-3 h1, .main-conteinar-text-4 h1 {
+  font-size: 3.5em;
+}
+
+.card-inicio-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-right: 22px;
+}
+
+.card-inicio{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  top: 40%;
+  width: 250px;
+  height: 250px;
+  border-radius: 10px;
+  text-shadow: none;
+}
+.card-inicio-container section{
+  position: relative;
+  top: 26%;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+}
+
+.card-destaque-2{
+  background: #59a55f;
+  color: white;
+}
+
+
+.card-destaque-3{
+  background: #436677;
+  color: white;
+}
+.card-destaque-4{
+  background: #4d6866;
+  color: white;
+}
+
+.card-inicio h1{
+  font-size: 1.5em;
+}
+
+/* FOOTER */
+footer {
+  margin-top: -10px;
+  color: black;
+  padding: 40px 20px 20px;
+  font-family: Arial, sans-serif;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.footer-logo h2 {
+  color: #f39c12;
+  margin-bottom: 10px;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li {
+  margin: 8px 0;
+}
+
+.footer-links ul li a {
+  text-decoration: none;
+  color: gray;
+  transition: 0.3s;
+}
+
+.footer-links ul li a:hover {
+  color: #f39c12;
+}
+
+.footer-contact p {
+  margin: 6px 0;
+  color: gray;
+}
+
+.footer-social a {
+  margin-right: 10px;
+  display: inline-block;
+}
+
+.footer-social img {
+    color: gray;
+
+  width: 24px;
+  transition: transform 0.3s;
+}
+.footer-social h3{
+    margin-bottom: 15px;
+}
+
+.footer-social img:hover {
+  transform: scale(1.2);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #333;
+  margin-top: 20px;
+  padding-top: 15px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.container {
+  width: 400px;
+  height: 400px;
+  position: relative;
+  left: 20%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.center {
+  width: 180px;
+  height: 60px;
+  position: relative;
+}
+
+.btn {
+  width: 180px;
+  height: 60px;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid #257e29;
+  text-align: center;
+  outline: none;
+  transition: 1s ease-in-out;
+  color: rgb(39, 68, 34);
+}
+
+svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  fill: none;
+  stroke: #ffffff;
+  stroke-dasharray: 150 480;
+  stroke-dashoffset: 150;
+  transition: 1s ease-in-out;
+}
+
+.btn:hover svg {
+  stroke-dashoffset: -480;
+}
+
+.btn span {
+  font-size: 14px;
+  font-weight: 100;
+}
+
+.btn:hover {
+  transition: 1s ease-in-out;
+}
+
+.btn p{
+  margin-bottom: 30px;
+}

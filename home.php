@@ -35,8 +35,8 @@
         <div class="carousel-container">
             <div class="carousel">
                 <div class="carousel-images" id="carousel">
-                    <img src="src\noronha.jpg" alt="Imagem 1">
-                    <img src="src\saoluis.jpg" alt="Imagem 2">
+                    <img src="src\saoluis.jpg" alt="Imagem 1">
+                    <img src="src\noronha.jpg" alt="Imagem 2">
                     <img src="src\balneario.webp" alt="Imagem 3">
                     <img src="src\gramado.jpg" alt="Imagem 4">
                 </div>
@@ -54,35 +54,39 @@
             </div>
             <div class="sugestoes-cards">
                 <div class="card">
-                    <h2>Balneario Camboriu </h2>
                     <div class="card-img card-img-1"></div>
                     <div class="card-info">
+                    <h2>Balneario Camboriu </h2>
+
                         <p>Praias animadas e vida noturna agitada <br>na costa catarinense.</p>
                         <a href="/viagem.php">Saiba mais</a>
                     </div>
                 </div>
                 <div class="card">
-                    <h2>Fernando de Noronha </h2>
                     <div class="card-img card-img-2"></div>
                     <div class="card-info">
+                    <h2>Fernando de Noronha </h2>
+
                         <p>O paraíso das praias cristalinas e mergulhos incríveis.</p>
                        
                         <a href="/viagem.php">Saiba mais</a>
                     </div>
                 </div>
                 <div class="card">
-                    <h2>Gramado</h2>
                     <div class="card-img card-img-3"></div>
                     <div class="card-info">
+                    <h2>Gramado</h2>
+
                         <p>O charme europeu com gastronomia e atrações encantadoras.</p>
                      
                         <a href="/viagem.php">Saiba mais</a>
                     </div>
                 </div>
                 <div class="card">
-                    <h2>São Luís </h2>
                     <div class="card-img card-img-4"></div>
                     <div class="card-info">
+                    <h2>São Luís </h2>
+
                         <p>A capital histórica com cultura vibrante e sabores do Maranhão.</p>
                         <a href="/viagem.php">Saiba mais</a>
                     </div>
@@ -115,7 +119,7 @@
             <div class="footer-contact">
             <h3>Contato</h3>
             <p>Email: contato@triply.com</p>
-            <p>Telefone: (61) 99999-97604</p>
+            <p>Telefone: (61) 99999-9999</p>
             <p>Endereço: Brasília - DF</p>
             </div>
 

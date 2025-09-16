@@ -35,8 +35,8 @@
         <div class="carousel-container">
             <div class="carousel">
                 <div class="carousel-images" id="carousel">
-                    <img src="src\saoluis.jpg" alt="Imagem 1">
-                    <img src="src\noronha.jpg" alt="Imagem 2">
+                    <img src="src\noronha.jpg" alt="Imagem 1">
+                    <img src="src\saoluis.jpg" alt="Imagem 2">
                     <img src="src\balneario.webp" alt="Imagem 3">
                     <img src="src\gramado.jpg" alt="Imagem 4">
                 </div>

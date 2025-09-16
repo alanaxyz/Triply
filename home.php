@@ -115,7 +115,7 @@
             <div class="footer-contact">
             <h3>Contato</h3>
             <p>Email: contato@triply.com</p>
-            <p>Telefone: (61) 99999-9999</p>
+            <p>Telefone: (61) 99999-97604</p>
             <p>Endereço: Brasília - DF</p>
             </div>
 

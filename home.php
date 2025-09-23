@@ -22,7 +22,7 @@
             <a href="">Inicio</a>
             <a href="">Sobre</a>
             <a href="">Viagens</a>
-            <a href="">Grupos</a>
+            <a href="grupos.php">Grupos</a>
         </span>
         <span>
             <div class="login">

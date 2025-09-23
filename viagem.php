@@ -22,7 +22,7 @@
             <a href="/home.php">Inicio</a>
             <a href="">Sobre</a>
             <a href="">Viagens</a>
-            <a href="">Grupos</a>
+            <a href="grupos.php">Grupos</a>
         </span>
         <span>
             <div class="login">
@@ -37,7 +37,7 @@
             <img src="src/balneario.webp" alt="">
             <h1>Balneário Camboriú</h1>
             <p>O destino que une belas praias, vida noturna agitada e um dos maiores complexos de turismo e entretenimento do Brasil.</p>
-            <button>Criar grupo</button>
+            <button onclick="window.location.href='grupos.php'">Criar grupo</button>
         </div>
         
         <section class="content">

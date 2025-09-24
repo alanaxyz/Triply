@@ -84,7 +84,7 @@
                             </div>
                             <div class="progress-percentage">48% concluído</div>
                         </div>
-                        <p>Última contribuição: João Silva - R$ 200,00 (há 3 dias)</p>
+                        <p>Última contribuição: Alana - R$ 200,00 (há 3 dias)</p>
                     </div>
                     
                     <!-- Membros do Grupo -->
@@ -97,35 +97,35 @@
                             <!-- Membro 1 -->
                             <div class="member-card">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="João Silva" class="member-avatar">
-                                <div class="member-name">João Silva</div>
+                                <div class="member-name">Alana</div>
                                 <div class="member-role admin">Administrador</div>
                             </div>
                             
                             <!-- Membro 2 -->
                             <div class="member-card">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Maria Santos" class="member-avatar">
-                                <div class="member-name">Maria Santos</div>
+                                <div class="member-name">Jennefer</div>
                                 <div class="member-role">Membro</div>
                             </div>
                             
                             <!-- Membro 3 -->
                             <div class="member-card">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Pedro Oliveira" class="member-avatar">
-                                <div class="member-name">Pedro Oliveira</div>
+                                <div class="member-name">Artur</div>
                                 <div class="member-role">Membro</div>
                             </div>
                             
                             <!-- Membro 4 -->
                             <div class="member-card">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Ana Costa" class="member-avatar">
-                                <div class="member-name">Ana Costa</div>
+                                <div class="member-name">Vinicius</div>
                                 <div class="member-role">Membro</div>
                             </div>
                             
                             <!-- Membro 5 -->
                             <div class="member-card">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Carlos Lima" class="member-avatar">
-                                <div class="member-name">Carlos Lima</div>
+                                <div class="member-name">Luiz</div>
                                 <div class="member-role">Membro</div>
                             </div>
                             
@@ -149,28 +149,28 @@
                             <li class="activity-item">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="João Silva" class="activity-avatar">
                                 <div class="activity-content">
-                                    <div class="activity-text"><strong>João Silva</strong> adicionou R$ 200,00 ao cofre do grupo</div>
+                                    <div class="activity-text"><strong>Alana</strong> adicionou R$ 200,00 ao cofre do grupo</div>
                                     <div class="activity-time">há 3 dias</div>
                                 </div>
                             </li>
                             <li class="activity-item">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Maria Santos" class="activity-avatar">
                                 <div class="activity-content">
-                                    <div class="activity-text"><strong>Maria Santos</strong> sugeriu um novo restaurante para o roteiro</div>
+                                    <div class="activity-text"><strong>Jennefer</strong> sugeriu um novo restaurante para o roteiro</div>
                                     <div class="activity-time">há 5 dias</div>
                                 </div>
                             </li>
                             <li class="activity-item">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Pedro Oliveira" class="activity-avatar">
                                 <div class="activity-content">
-                                    <div class="activity-text"><strong>Pedro Oliveira</strong> confirmou presença na viagem</div>
+                                    <div class="activity-text"><strong>Artur</strong> confirmou presença na viagem</div>
                                     <div class="activity-time">há 1 semana</div>
                                 </div>
                             </li>
                             <li class="activity-item">
                                 <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="Ana Costa" class="activity-avatar">
                                 <div class="activity-content">
-                                    <div class="activity-text"><strong>Ana Costa</strong> compartilhou fotos de hospedagens</div>
+                                    <div class="activity-text"><strong>Luiz</strong> compartilhou fotos de hospedagens</div>
                                     <div class="activity-time">há 1 semana</div>
                                 </div>
                             </li>

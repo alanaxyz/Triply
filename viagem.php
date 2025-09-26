@@ -20,8 +20,8 @@
         <a href="" class="logo">Triply</a>
         <span>
             <a href="/home.php">Inicio</a>
-            <a href="">Sobre</a>
-            <a href="">Viagens</a>
+            <a href="sobre.php">Sobre</a>
+            <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>
         </span>
         <span>

@@ -1,5 +1,6 @@
 <?php
 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,74 +13,81 @@
 </head>
 <body>
     <nav class='navbar'>
-    <a href="">
+    <a href="/index.php">
         <p class="logo">Triply</p>
     </a>
     
         <span>
-            <a href="">Sobre</a>
+            <a href="sobre.php">Sobre</a>
             <div class="login">
                 <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <a href="">Login</a>
+                <a href="/login">Login</a>
             </div>
-            <div class="register">
-                <img src="https://img.icons8.com/?size=100&id=Z6wAIySfvC7I&format=png&color=000000" alt="">
-                <a href="">Cadastre-se</a>
-            </div>
+           
         </span>
     </nav>
 
-    <div class="main-container">
-        <div class="main-content">
-            <div class="main-form cadastro-form">
-                <div class = "form-text">
-                        <h1>
-                            Bem vindo ao
-                            <br><strong>Triply!</strong>
-                        </h1>
-                    </div>
-                <form action="login.php" method="post">
-                    <span>
-                        <label for="nome">Nome</label>
-                        <input type="text" id="nome" name="nome">
-                    </span>
-                     <span>
-                        <label for="sobrenome">Sobrenome</label>
-                        <input type="text" id="sobrenome" name="sobrenome">
-                    </span>
-                    <span>
-                        <label for="cpf">CPF</label>
-                        <input type="text" id="cpf" name="cpf">
-                    </span>
-                    <span>
-                        <label for="email">Email</label>
-                        <input type="text" id="email" name="email">
-                    </span>
-                    <span>
-                        <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha">
-                    </span>
-                    <span>
-                        <label for="confirmar-senha">Confirmar Senha</label>
-                        <input type="password" id="confirmar-senha" name="confirmar-senha">
-                        <p>As senhas devem conter 12 caracteres</p>
-                    </span>
-                     <span>
-                        <label for="date">Data de Nascimento</label>
-                        <input type="date" id="date" name="date">
-                    </span>
-                    <span>
-                        <label for="sexo">Sexo</label>
-                        <input type="password" id="sexo" name="sexo">
-                    </span>
-                    <span>
-                        <button type ="submit" class="entrar">Registrar</button>
-                    </span>
-                </form>
+      <div class="container">
+        
+        <div class="card">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Junte-se à<br><strong>comunidade Triply</strong></h1>
+                <p class="welcome-subtitle">Crie sua conta para começar a planejar viagens</p>
             </div>
+
+            <form id="registerForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sobrenome">Sobrenome</label>
+                        <input type="text" id="sobrenome" name="sobrenome" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" name="cpf" required maxlength="14" placeholder="000.000.000-00">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Data de Nascimento</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required minlength="12">
+                    <div class="password-hint">A senha deve conter pelo menos 12 caracteres</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar-senha">Confirmar Senha</label>
+                    <input type="password" id="confirmar-senha" name="confirmar-senha" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Criar Conta</button>
+
+                <div class="login-section">
+                    <span class="login-text">Já tem uma conta?</span>
+                    <a href="login.php" class="login-link">Faça login</a>
+                </div>
+            </form>
         </div>
     </div>
-
     <footer>
         <div class="footer-container">
             <!-- Logo / Nome -->
@@ -120,5 +128,93 @@
             <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
         </div>
     </footer>
+     <script>
+        // Máscaras e validações
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+
+        // Validação do formulário
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmar-senha').value;
+            const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+            
+            // Limpar estados anteriores
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('error', 'success');
+            });
+
+            let isValid = true;
+
+            // Validação de senha
+            if (senha.length < 12) {
+                document.getElementById('senha').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (senha !== confirmarSenha) {
+                document.getElementById('confirmar-senha').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            // Validação básica de CPF
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                document.getElementById('cpf').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            // Validar campos obrigatórios
+            const requiredFields = document.querySelectorAll('input[required]');
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.parentElement.classList.add('error');
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                // Simular envio bem-sucedido
+                this.classList.add('loading');
+                document.querySelector('.btn-submit').textContent = 'Criando conta...';
+                
+                setTimeout(() => {
+                    alert('Conta criada com sucesso!');
+                    this.submit();
+                }, 1000);
+            } else {
+                alert('Por favor, corrija os campos destacados');
+            }
+        });
+
+        // Feedback visual em tempo real
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.parentElement.classList.remove('error');
+                    this.parentElement.classList.add('success');
+                } else {
+                    this.parentElement.classList.remove('success');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

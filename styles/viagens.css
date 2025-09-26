@@ -1,0 +1,437 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@font-face {
+    font-family: 'Belgiano'; /* nome que usa no CSS */
+    src: url('../fonts/Belgiano.ttf') format('truetype'); /* caminho para o arquivo */
+    font-weight: normal;
+    font-style: normal;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    font-style: Light 300;
+}
+body{
+    background: #EBFCFB;
+}
+
+        
+        :root {
+            --primary: #4A90E2;
+            --primary-dark: #3A7BC8;
+            --secondary: #50E3C2;
+            --light: #F7F9FC;
+            --dark: #333333;
+            --gray: #8A94A6;
+            --light-gray: #E6ECF0;
+            --white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* navbar */
+
+    .logo{
+        font-family: Belgiano, sans-serif;
+        font-size: 2em;
+        margin-left: 60px;
+    }
+    .navbar, footer{
+        color: black;
+        background: #FBFBFF;    
+    }
+    .navbar{
+        width: 100%;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: bold;
+    }
+    .navbar span{
+        display: flex;
+        gap: 100px;
+        margin: 0 50px;
+    }
+    .navbar .login, .navbar .register{
+        display: flex;
+    }
+    .navbar img{
+        width: 20px;
+        margin-right: 5px;
+    }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #A0C1D1 0%, #37586e 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        /* Filtros */
+        .filters-section {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .filters-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .filters-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-filter {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .btn-apply {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-reset {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+        
+        /* Grid de Destinos */
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .destination-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .destination-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .destination-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .destination-content {
+            padding: 20px;
+        }
+        
+        .destination-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .destination-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .destination-location {
+            color: var(--gray);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .destination-rating {
+            background: var(--secondary);
+            color: var(--dark);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .destination-description {
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .destination-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        .detail-item svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--gray);
+        }
+        
+        .destination-price {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .price-label {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .price-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .price-period {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .destination-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-destination {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .btn-details {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+        
+        .btn-create-group {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+  /* Footer */
+        footer {
+        margin-top: 10%;
+        color: black;
+        padding: 40px 20px 20px;
+        font-family: Arial, sans-serif;
+        }
+
+        .footer-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: auto;
+        }
+
+        .footer-logo h2 {
+        color: #f39c12;
+        margin-bottom: 10px;
+        }
+
+        .footer-links ul {
+        list-style: none;
+        padding: 0;
+        }
+
+        .footer-links ul li {
+        margin: 8px 0;
+        }
+
+        .footer-links ul li a {
+        text-decoration: none;
+        color: gray;
+        transition: 0.3s;
+        }
+
+        .footer-links ul li a:hover {
+        color: #f39c12;
+        }
+
+        .footer-contact p {
+        margin: 6px 0;
+        color: gray;
+        }
+
+        .footer-social a {
+        margin-right: 10px;
+        display: inline-block;
+        }
+
+        .footer-social img {
+        width: 24px;
+        transition: transform 0.3s;
+        }
+        .footer-social h3{
+            margin-bottom: 15px;
+        }
+
+        .footer-social img:hover {
+        transform: scale(1.2);
+        }
+
+        .footer-bottom {
+        text-align: center;
+        border-top: 1px solid #333;
+        margin-top: 20px;
+        padding-top: 15px;
+        color: #aaa;
+        font-size: 14px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .destinations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero {
+                padding: 60px 0;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .destination-actions {
+                flex-direction: column;
+            }
+        }

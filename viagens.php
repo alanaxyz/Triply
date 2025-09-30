@@ -236,7 +236,6 @@ function getDuracao($nome) {
                             </div>
                             
                             <div class="destination-actions">
-<<<<<<< HEAD
                                 <button class="btn-destination btn-details" 
                                         onclick="viewDestination('<?= htmlspecialchars($destino['nome']) ?>')">
                                     Ver Detalhes
@@ -245,7 +244,6 @@ function getDuracao($nome) {
                                         onclick="createGroup('<?= htmlspecialchars($destino['nome']) ?>')">
                                     Criar Grupo
                                 </button>
-=======
                                 <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
                                 <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
                             </div>
@@ -341,7 +339,6 @@ function getDuracao($nome) {
                             <div class="destination-actions">
                                 <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
                                 <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
->>>>>>> 3711dc333c61bd8b15832e8a1576159a4c03da8b
                             </div>
                         </div>
                     </div>

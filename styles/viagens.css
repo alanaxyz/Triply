@@ -154,7 +154,7 @@ body{
         
         .filter-group select,
         .filter-group input {
-            width: 100%;
+            width: 96%;
             padding: 12px;
             border: 1px solid var(--light-gray);
             border-radius: 8px;
@@ -266,9 +266,9 @@ body{
             color: var(--gray);
         }
         
-        .detail-item svg {
-            width: 16px;
-            height: 16px;
+        .detail-item img {
+            width: 20px;
+            height: 20px;
             fill: var(--gray);
         }
         

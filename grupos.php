@@ -44,10 +44,9 @@ if (isset($_SESSION['email'])) {
             <div id="emptyState" class="state-container active">
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/>
-                        </svg>
-                    </div>
+
+                    <img src="" alt="">
+                </div>
                     <h2>Você ainda não está em nenhum grupo</h2>
                     <p>Junte-se a um grupo existente usando um código de convite ou crie um novo grupo para começar a planejar sua viagem.</p>
                     
@@ -83,10 +82,9 @@ if (isset($_SESSION['email'])) {
                                 <div>
                                     <h3 class="group-title">Balneário Camboriú</h3>
                                     <div class="group-members">
-                                        <svg viewBox="0 0 24 24">
-                                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A2.01 2.01 0 0 0 18.06 7h-1.24c-.77 0-1.47.46-1.79 1.17L12.5 13H10v-2c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v2H2v6h6v-2h2v2h10zm-6-2H8v-4h2v4zm-7-9c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v3H7v-3z"/>
-                                        </svg>
-                                        <span>5/8 membros</span>
+
+                    <img src="" alt="">
+                                    <span>5/8 membros</span>
                                     </div>
                                 </div>
                             </div>

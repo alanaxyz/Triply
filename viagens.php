@@ -236,6 +236,7 @@ function getDuracao($nome) {
                             </div>
                             
                             <div class="destination-actions">
+<<<<<<< HEAD
                                 <button class="btn-destination btn-details" 
                                         onclick="viewDestination('<?= htmlspecialchars($destino['nome']) ?>')">
                                     Ver Detalhes
@@ -244,6 +245,103 @@ function getDuracao($nome) {
                                         onclick="createGroup('<?= htmlspecialchars($destino['nome']) ?>')">
                                     Criar Grupo
                                 </button>
+=======
+                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
+                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="destination-card" data-type="praia" data-price="premium" data-duration="media">
+                        <img src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Fernando de Noronha" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-header">
+                                <div>
+                                    <h3 class="destination-title">Rio de Janeiro</h3>
+                                    <div class="destination-location">
+                                        RJ, Brasil
+                                    </div>
+                                </div>
+                                <div class="destination-rating">4.9 ★</div>
+                            </div>
+                            <p class="destination-description">Paraíso ecológico com praias paradisíacas e vida marinha exuberante.</p>
+                            
+                            <div class="destination-details">
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="">
+                                    Pousadas: 50+
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="">
+                                    15 Praias
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="">
+                                    Melhor época: Abr-Out
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="">
+                                    Custo médio: 7 dias
+                                </div>
+                            </div>
+                            
+                            <div class="destination-price">
+                                <div class="price-label">Preço médio por pessoa</div>
+                                <div class="price-value">R$ 3.500</div>
+                                <div class="price-period">para 7 dias</div>
+                            </div>
+                            
+                            <div class="destination-actions">
+                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
+                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destino 3 - Chapada dos Veadeiros -->
+                    <div class="destination-card" data-type="aventura" data-price="economico" data-duration="media">
+                        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Chapada dos Veadeiros" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-header">
+                                <div>
+                                    <h3 class="destination-title">Chapada dos Veadeiros</h3>
+                                    <div class="destination-location">
+                                        Goiás, Brasil
+                                    </div>
+                                </div>
+                                <div class="destination-rating">4.6 ★</div>
+                            </div>
+                            <p class="destination-description">Paraíso do ecoturismo com cachoeiras cristalinas e trilhas incríveis.</p>
+                            
+                            <div class="destination-details">
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="">
+                                    Pousadas: 80+
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="">
+                                    40 Cachoeiras
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="">
+                                    Melhor época: Mai-Set
+                                </div>
+                                <div class="detail-item">
+                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="">
+                                    Custo médio: 4 dias
+                                </div>
+                            </div>
+                            
+                            <div class="destination-price">
+                                <div class="price-label">Preço médio por pessoa</div>
+                                <div class="price-value">R$ 800</div>
+                                <div class="price-period">para 4 dias</div>
+                            </div>
+                            
+                            <div class="destination-actions">
+                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
+                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
+>>>>>>> 3711dc333c61bd8b15832e8a1576159a4c03da8b
                             </div>
                         </div>
                     </div>

@@ -43,7 +43,7 @@ if (isset($_SESSION['email'])) {
     <!-- Conteúdo Principal -->
     <main class="main-content">
         <div class="container">
-            <!-- Nossa História -->
+           
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Nossa História</h2>
@@ -68,7 +68,7 @@ if (isset($_SESSION['email'])) {
                 </div>
             </section>
 
-            <!-- Missão e Visão -->
+          
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Missão e Visão</h2>
@@ -86,7 +86,7 @@ if (isset($_SESSION['email'])) {
                 </div>
             </section>
 
-            <!-- O Que Oferecemos -->
+           
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">O Que Oferecemos</h2>
@@ -111,7 +111,7 @@ if (isset($_SESSION['email'])) {
                 </div>
             </section
 
-            <!-- Contato -->
+           
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Fale Conosco</h2>

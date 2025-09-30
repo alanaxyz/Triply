@@ -143,15 +143,14 @@ if (isset($_SESSION['email'])) {
                         </div>
                     </div>
 
-                    <!-- Destino 2 - Fernando de Noronha -->
                     <div class="destination-card" data-type="praia" data-price="premium" data-duration="media">
                         <img src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Fernando de Noronha" class="destination-image">
                         <div class="destination-content">
                             <div class="destination-header">
                                 <div>
-                                    <h3 class="destination-title">Fernando de Noronha</h3>
+                                    <h3 class="destination-title">Rio de Janeiro</h3>
                                     <div class="destination-location">
-                                        Pernambuco, Brasil
+                                        RJ, Brasil
                                     </div>
                                 </div>
                                 <div class="destination-rating">4.9 ★</div>

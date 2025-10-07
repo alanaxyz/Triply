@@ -17,10 +17,6 @@
     
         <span>
             <a href="sobre.php">Sobre</a>
-            <div class="login">
-                <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <a href="">Login</a>
-            </div>
             <div class="register">
                 <img src="https://img.icons8.com/?size=100&id=Z6wAIySfvC7I&format=png&color=000000" alt="">
                 <a href="/register.php">Cadastre-se</a>

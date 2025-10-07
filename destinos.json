@@ -3,7 +3,7 @@
         "nome": "Cristo Redentor",
         "estado": "RJ",
         "cidade": "Rio de Janeiro",
-        "imagem": "/home/ubuntu/cristo_redentor.png",
+        "imagem": "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Mirante Dona Marta",
             "Corcovado",
@@ -37,7 +37,7 @@
         "nome": "Cataratas do Iguaçu",
         "estado": "PR",
         "cidade": "Foz do Iguaçu",
-        "imagem": "/home/ubuntu/cataratas_do_iguacu.png",
+        "imagem": "https://images.unsplash.com/photo-1544816155-12df9643f363?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "TRILHA DAS CATARATAS",
             "CAMINHO DO POÇO PRETO",
@@ -75,7 +75,7 @@
         "nome": "Lençóis Maranhenses",
         "estado": "MA",
         "cidade": "Maranhão",
-        "imagem": "/home/ubuntu/lencois_maranhenses.png",
+        "imagem": "https://images.unsplash.com/photo-1557170336-a4d03c6d043e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Lagoas dos Pequenos Lençóis (Vassouras)",
             "Farol Preguiças (Mandacaru)",
@@ -117,7 +117,7 @@
         "nome": "Pão de Açúcar",
         "estado": "RJ",
         "cidade": "Rio de Janeiro",
-        "imagem": "/home/ubuntu/pao_de_acucar.png",
+        "imagem": "https://images.unsplash.com/photo-1544984243-ec57ea16fe25?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Morro da Urca",
             "Praia Vermelha",
@@ -147,7 +147,7 @@
         "nome": "Fernando de Noronha",
         "estado": "PE",
         "cidade": "Pernambuco",
-        "imagem": "/home/ubuntu/fernando_de_noronha.png",
+        "imagem": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Praia do Sancho",
             "Baía dos Porcos",
@@ -188,7 +188,7 @@
         "nome": "Praia da Pipa",
         "estado": "RN",
         "cidade": "Rio Grande do Norte",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [],
         "hospedagens": []
     },
@@ -196,7 +196,7 @@
         "nome": "Maragogi",
         "estado": "AL",
         "cidade": "Alagoas",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1599640842225-71515b912178?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Praia de Antunes",
             "Maragogi Beach",
@@ -219,7 +219,7 @@
         "nome": "Tamandaré",
         "estado": "PE",
         "cidade": "Pernambuco",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Praia dos Carneiros",
             "Praia de Tamandaré",
@@ -246,7 +246,7 @@
         "nome": "Jalapão",
         "estado": "TO",
         "cidade": "Tocantins",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1617631348317-66bce3c36dc5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Fervedouros",
             "Dunas do Jalapão",
@@ -271,7 +271,7 @@
         "nome": "Manaus",
         "estado": "AM",
         "cidade": "Amazonas",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Teatro Amazonas",
             "Largo São Sebastião",
@@ -307,7 +307,7 @@
         "nome": "Bonito",
         "estado": "MS",
         "cidade": "Mato Grosso do Sul",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1626806789293-40d839a309b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Gruta do Lago Azul",
             "Recanto Ecológico Rio da Prata",
@@ -353,7 +353,7 @@
         "nome": "Chapada dos Veadeiros",
         "estado": "GO",
         "cidade": "Goiás",
-        "imagem": "",
+        "imagem": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
         "principais_locais": [
             "Parque Nacional da Chapada dos Veadeiros",
             "Catarata dos Couros",
@@ -391,6 +391,7 @@
             "Pousada Meu Talento"
         ]
     },
+
     {
         "nome": "Caraíva",
         "estado": "BA",
@@ -539,7 +540,7 @@
         "nome": "Angra dos Reis",
         "estado": "RJ",
         "cidade": "Rio de Janeiro",
-        "imagem": "",
+        "imagem": "https://www.dicasondeficar.com.br/wp-content/uploads/2015/12/Mercure-Angra-dos-Reis-Onde-ficar-em-Angra-dos-Reis.jpg",
         "principais_locais": [
             "Praia de Lopes Mendes",
             "Lagoa Azul",

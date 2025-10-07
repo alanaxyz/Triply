@@ -1,11 +1,11 @@
 <?php
     session_start();
-
-    if (isset($_SESSION['email'])) {
-        $email = $_SESSION['email'];
-    } else {
-        $email = "";
+    if (!isset($_SESSION['usuario_id'])) {
+    header("Location: index.php");
+    exit;
     }
+    $usuario_nome = $_SESSION['usuario_nome'] ?? '';
+    
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -27,7 +27,8 @@
         <span>
             <div class="login">
                 <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <p><?= $email ?></p>
+                <p><?= $usuario_nome?></p>
+
             </div>
         </span>
     </nav>

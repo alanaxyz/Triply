@@ -1,11 +1,12 @@
 <?php
     session_start();
-
-    if (isset($_SESSION['email'])) {
-        $email = $_SESSION['email'];
-    } else {
-        $email = "";
+    if (!isset($_SESSION['usuario_id'])) {
+    header("Location: index.php");
+    exit;
     }
+    $usuario_nome = $_SESSION['usuario_nome'] ?? '';
+
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -27,17 +28,21 @@
         <span>
             <div class="login">
                 <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <p><?= $email ?></p>
+                <p><?= $usuario_nome?></p>
             </div>
         </span>
     </nav>
 
     <section class="main">
-        <div class="main-img">
-            <img src="src/balneario.webp" alt="">
-            <h1>Balneário Camboriú</h1>
-            <p>O destino que une belas praias, vida noturna agitada e um dos maiores complexos de turismo e entretenimento do Brasil.</p>
-            <button onclick="window.location.href='grupos.php'">Criar grupo</button>
+        <div class="main-hero">
+            <div class="hero-image">
+                <img src="src/balneario.webp" alt="Balneário Camboriú">
+                <div class="hero-content">
+                    <h1>Balneário Camboriú</h1>
+                    <p>O destino que une belas praias, vida noturna agitada e um dos maiores complexos de turismo e entretenimento do Brasil.</p>
+                    <button onclick="window.location.href='grupos.php'">Criar grupo</button>
+                </div>
+            </div>
         </div>
         
         <section class="content">

@@ -1,6 +1,65 @@
 <?php
+session_start();
+require __DIR__ . '/database/config.php';
 
+// Processar registro
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nome = $_POST['nome'] ?? '';
+    $sobrenome = $_POST['sobrenome'] ?? '';
+    $cpf = $_POST['cpf'] ?? '';
+    $data_nascimento = $_POST['date'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $telefone = $_POST['telefone'] ?? '';
+    $senha = $_POST['senha'] ?? '';
+    $confirmar_senha = $_POST['confirmar-senha'] ?? '';
 
+    // Validações básicas
+    if (empty($nome) || empty($sobrenome) || empty($cpf) || empty($data_nascimento) || empty($email) || empty($telefone) || empty($senha)) {
+        echo "<script>alert('Preencha todos os campos!'); window.location.href='register.php';</script>";
+        exit;
+    } elseif ($senha !== $confirmar_senha) {
+        echo "<script>alert('As senhas não coincidem!'); window.location.href='register.php';</script>";
+        exit;
+    } elseif (strlen($senha) < 6) {
+        echo "<script>alert('A senha deve ter pelo menos 6 caracteres!'); window.location.href='register.php';</script>";
+        exit;
+    } else {
+        try {
+            // Verificar se email já existe
+            $stmt = $db->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+            
+            if ($stmt->fetch()) {
+                echo "<script>alert('Este email já está cadastrado!'); window.location.href='register.php';</script>";
+                exit;
+            } else {
+                // Inserir novo usuário - AJUSTADO para a estrutura da sua tabela
+                $stmt = $db->prepare("INSERT INTO users (nome, data_nascimento, email, cpf, telefone, senha) VALUES (:nome, :data_nascimento, :email, :cpf, :telefone, :senha)");
+                
+                $dados = [
+                    ':nome' => $nome . ' ' . $sobrenome, // Junta nome e sobrenome
+                    ':data_nascimento' => $data_nascimento,
+                    ':email' => $email,
+                    ':cpf' => $cpf,
+                    // No array $dados, antes de inserir:
+                    ':telefone' => preg_replace('/\D/', '', $telefone), // Remove tudo que não é número
+                    ':senha' => password_hash($senha, PASSWORD_DEFAULT)
+                ];
+                
+                if ($stmt->execute($dados)) {
+                    echo "<script>alert('Conta criada com sucesso! Faça login para continuar.'); window.location.href='index.php';</script>";
+                    exit;
+                } else {
+                    echo "<script>alert('Erro ao criar conta. Tente novamente.'); window.location.href='register.php';</script>";
+                    exit;
+                }
+            }
+        } catch (PDOException $e) {
+            echo "<script>alert('Erro: " . addslashes($e->getMessage()) . "'); window.location.href='register.php';</script>";
+            exit;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +80,7 @@
             <a href="sobre.php">Sobre</a>
             <div class="login">
                 <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <a href="/login">Login</a>
+                <a href="index.php">Login</a>
             </div>
            
         </span>
@@ -35,7 +94,7 @@
                 <p class="welcome-subtitle">Crie sua conta para começar a planejar viagens</p>
             </div>
 
-            <form id="registerForm">
+            <form id="registerForm" method="POST" action="register.php">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="nome">Nome</label>
@@ -70,8 +129,8 @@
 
                 <div class="form-group">
                     <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" required minlength="12">
-                    <div class="password-hint">A senha deve conter pelo menos 12 caracteres</div>
+                    <input type="password" id="senha" name="senha" required minlength="6">
+                    <div class="password-hint">A senha deve conter pelo menos 6 caracteres</div>
                 </div>
 
                 <div class="form-group">
@@ -83,7 +142,7 @@
 
                 <div class="login-section">
                     <span class="login-text">Já tem uma conta?</span>
-                    <a href="login.php" class="login-link">Faça login</a>
+                    <a href="index.php" class="login-link">Faça login</a>
                 </div>
             </form>
         </div>
@@ -100,8 +159,8 @@
             <div class="footer-links">
             <h3>Links rápidos</h3>
             <ul>
-                <li><a href="#">Início</a></li>
-                <li><a href="#">Sobre</a></li>
+                <li><a href="index.php">Início</a></li>
+                <li><a href="sobre.php">Sobre</a></li>
                 <li><a href="#">Contato</a></li>
             </ul>
             </div>
@@ -151,8 +210,6 @@
 
         // Validação do formulário
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             const senha = document.getElementById('senha').value;
             const confirmarSenha = document.getElementById('confirmar-senha').value;
             const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
@@ -165,7 +222,7 @@
             let isValid = true;
 
             // Validação de senha
-            if (senha.length < 12) {
+            if (senha.length < 6) {
                 document.getElementById('senha').parentElement.classList.add('error');
                 isValid = false;
             }
@@ -190,17 +247,14 @@
                 }
             });
 
-            if (isValid) {
-                // Simular envio bem-sucedido
+            if (!isValid) {
+                e.preventDefault();
+                alert('Por favor, corrija os campos destacados');
+            } else {
+                // Mostrar loading
                 this.classList.add('loading');
                 document.querySelector('.btn-submit').textContent = 'Criando conta...';
-                
-                setTimeout(() => {
-                    alert('Conta criada com sucesso!');
-                    this.submit();
-                }, 1000);
-            } else {
-                alert('Por favor, corrija os campos destacados');
+                // O formulário será enviado normalmente
             }
         });
 

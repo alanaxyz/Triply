@@ -1,35 +1,45 @@
 <?php
-session_start();
+    session_start();
+    if (!isset($_SESSION['usuario_id'])) {
+        header("Location: index.php");
+        exit;
+    }
+    $usuario_nome = $_SESSION['usuario_nome'] ?? '';
 
-if (isset($_SESSION['email'])) {
-    $email = $_SESSION['email'];
-} else {
-    $email = "";
-}
+
 
 // Carregar o JSON com os destinos
-$json_data = file_get_contents('destinos.json'); // Coloque seu JSON em um arquivo separado
+$json_data = file_get_contents('destinos.json');
 $destinos = json_decode($json_data, true);
 
 // Função para determinar o tipo de viagem baseado no nome/local
-function getTipoViagem($nome) {
+function getTipoViagem($nome, $principais_locais) {
     $nome_lower = strtolower($nome);
+    $locais_str = strtolower(implode(' ', $principais_locais));
     
     if (strpos($nome_lower, 'praia') !== false || 
+        strpos($locais_str, 'praia') !== false ||
         strpos($nome_lower, 'ilhabela') !== false ||
         strpos($nome_lower, 'noronha') !== false ||
         strpos($nome_lower, 'porto') !== false ||
-        strpos($nome_lower, 'jericoacoara') !== false) {
+        strpos($nome_lower, 'jericoacoara') !== false ||
+        strpos($nome_lower, 'maragogi') !== false ||
+        strpos($nome_lower, 'tamandaré') !== false) {
         return 'praia';
     } elseif (strpos($nome_lower, 'chapada') !== false || 
                strpos($nome_lower, 'serra') !== false ||
                strpos($nome_lower, 'cachoeira') !== false ||
-               strpos($nome_lower, 'jalapão') !== false) {
+               strpos($nome_lower, 'jalapão') !== false ||
+               strpos($nome_lower, 'cataratas') !== false ||
+               strpos($nome_lower, 'bonito') !== false) {
         return 'aventura';
     } elseif (strpos($nome_lower, 'cristo') !== false || 
-               strpos($nome_lower, 'cidade') !== false ||
-               strpos($nome_lower, 'histórico') !== false ||
-               strpos($nome_lower, 'teatro') !== false) {
+               strpos($nome_lower, 'teatro') !== false ||
+               strpos($nome_lower, 'museu') !== false ||
+               strpos($nome_lower, 'mercado') !== false ||
+               strpos($nome_lower, 'manaus') !== false ||
+               strpos($nome_lower, 'curitiba') !== false ||
+               strpos($nome_lower, 'ouro preto') !== false) {
         return 'cidade';
     } else {
         return 'aventura';
@@ -45,7 +55,14 @@ function getPrecoMedio($nome) {
         'Chapada dos Veadeiros' => 800,
         'Lençóis Maranhenses' => 1500,
         'Cataratas do Iguaçu' => 1800,
-        'Balneário Camboriú' => 1800
+        'Balneário Camboriú' => 1800,
+        'Rio de Janeiro' => 2000,
+        'Florianópolis' => 1600,
+        'Gramado' => 1900,
+        'Porto de Galinhas' => 1700,
+        'Manaus' => 1400,
+        'Chapada Diamantina' => 900,
+        'Jalapão' => 1100
     ];
     
     return isset($precos[$nome]) ? $precos[$nome] : 1200;
@@ -59,10 +76,30 @@ function getDuracao($nome) {
         'Bonito' => 4,
         'Chapada dos Veadeiros' => 4,
         'Lençóis Maranhenses' => 5,
-        'Cataratas do Iguaçu' => 3
+        'Cataratas do Iguaçu' => 3,
+        'Rio de Janeiro' => 5,
+        'Florianópolis' => 6,
+        'Gramado' => 4,
+        'Porto de Galinhas' => 5,
+        'Manaus' => 5,
+        'Chapada Diamantina' => 5,
+        'Jalapão' => 4
     ];
     
     return isset($duracoes[$nome]) ? $duracoes[$nome] : 5;
+}
+
+// Função para obter imagem padrão baseada no tipo
+function getImagemPadrao($tipo, $nome) {
+    $imagens = [
+        'praia' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+        'aventura' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+        'cidade' => 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+        'montanha' => 'https://images.unsplash.com/photo-1464822759844-d2d137717a1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+        'romantico' => 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'
+    ];
+    
+    return $imagens[$tipo] ?? $imagens['aventura'];
 }
 ?>
 <!DOCTYPE html>
@@ -71,7 +108,7 @@ function getDuracao($nome) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./styles/viagens.css">
-    <title>Grupos</title>
+    <title>Destinos - Triply</title>
 </head>
 <body>
     <nav class='navbar'>
@@ -85,7 +122,7 @@ function getDuracao($nome) {
         <span>
             <div class="login">
                 <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <p><?= htmlspecialchars($email) ?></p>
+                <p><?= $usuario_nome ?></p>
             </div>
         </span>
     </nav>
@@ -158,7 +195,7 @@ function getDuracao($nome) {
                     <?php foreach ($destinos as $destino): 
                         if (empty($destino['nome'])) continue;
                         
-                        $tipo = getTipoViagem($destino['nome']);
+                        $tipo = getTipoViagem($destino['nome'], $destino['principais_locais'] ?? []);
                         $preco = getPrecoMedio($destino['nome']);
                         $duracao = getDuracao($destino['nome']);
                         
@@ -181,11 +218,20 @@ function getDuracao($nome) {
                         }
                         
                         // Imagem padrão se não tiver
-                        $imagem = !empty($destino['imagem']) ? $destino['imagem'] : 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80';
+                        $imagem = !empty($destino['imagem']) ? $destino['imagem'] : getImagemPadrao($tipo, $destino['nome']);
                         
                         // Contar atrações e hospedagens
                         $num_atracoes = count($destino['principais_locais'] ?? []);
                         $num_hospedagens = count($destino['hospedagens'] ?? []);
+                        
+                        // Descrição baseada nas informações disponíveis
+                        if ($num_atracoes > 0 && $num_hospedagens > 0) {
+                            $descricao = "Explore {$num_atracoes} atrações incríveis com {$num_hospedagens} opções de hospedagem em " . $destino['cidade'] . ".";
+                        } elseif ($num_atracoes > 0) {
+                            $descricao = "Descubra {$num_atracoes} atrações imperdíveis em " . $destino['cidade'] . ".";
+                        } else {
+                            $descricao = "Destino maravilhoso em " . $destino['cidade'] . " aguardando sua visita.";
+                        }
                     ?>
                     <div class="destination-card" 
                          data-type="<?= $tipo ?>" 
@@ -198,33 +244,30 @@ function getDuracao($nome) {
                                 <div>
                                     <h3 class="destination-title"><?= htmlspecialchars($destino['nome']) ?></h3>
                                     <div class="destination-location">
-                                        <?= htmlspecialchars($destino['cidade'] ?? '') ?>, <?= htmlspecialchars($destino['estado'] ?? '') ?>
+                                        <?= htmlspecialchars($destino['cidade']) ?>, <?= htmlspecialchars($destino['estado']) ?>
                                     </div>
                                 </div>
                                 <div class="destination-rating">4.5 ★</div>
                             </div>
                             <p class="destination-description">
-                                <?= $num_atracoes > 0 ? 
-                                    'Destino incrível com ' . $num_atracoes . ' atrações principais e ' . $num_hospedagens . ' opções de hospedagem.' : 
-                                    'Destino maravilhoso aguardando mais informações.' 
-                                ?>
+                                <?= $descricao ?>
                             </p>
                             
                             <div class="destination-details">
                                 <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="">
+                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="Hospedagens">
                                     Hospedagens: <?= $num_hospedagens ?>+
                                 </div>
                                 <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="">
+                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="Atrações">
                                     <?= $num_atracoes ?> Atrações
                                 </div>
                                 <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="">
-                                    Tipo: <?= ucfirst($tipo) ?>
+                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="Tipo">
+                                    <?= ucfirst($tipo) ?>
                                 </div>
                                 <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="">
+                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="Duração">
                                     <?= $duracao ?> dias
                                 </div>
                             </div>
@@ -244,101 +287,6 @@ function getDuracao($nome) {
                                         onclick="createGroup('<?= htmlspecialchars($destino['nome']) ?>')">
                                     Criar Grupo
                                 </button>
-                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
-                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="destination-card" data-type="praia" data-price="premium" data-duration="media">
-                        <img src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Fernando de Noronha" class="destination-image">
-                        <div class="destination-content">
-                            <div class="destination-header">
-                                <div>
-                                    <h3 class="destination-title">Rio de Janeiro</h3>
-                                    <div class="destination-location">
-                                        RJ, Brasil
-                                    </div>
-                                </div>
-                                <div class="destination-rating">4.9 ★</div>
-                            </div>
-                            <p class="destination-description">Paraíso ecológico com praias paradisíacas e vida marinha exuberante.</p>
-                            
-                            <div class="destination-details">
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="">
-                                    Pousadas: 50+
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="">
-                                    15 Praias
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="">
-                                    Melhor época: Abr-Out
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="">
-                                    Custo médio: 7 dias
-                                </div>
-                            </div>
-                            
-                            <div class="destination-price">
-                                <div class="price-label">Preço médio por pessoa</div>
-                                <div class="price-value">R$ 3.500</div>
-                                <div class="price-period">para 7 dias</div>
-                            </div>
-                            
-                            <div class="destination-actions">
-                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
-                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Destino 3 - Chapada dos Veadeiros -->
-                    <div class="destination-card" data-type="aventura" data-price="economico" data-duration="media">
-                        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Chapada dos Veadeiros" class="destination-image">
-                        <div class="destination-content">
-                            <div class="destination-header">
-                                <div>
-                                    <h3 class="destination-title">Chapada dos Veadeiros</h3>
-                                    <div class="destination-location">
-                                        Goiás, Brasil
-                                    </div>
-                                </div>
-                                <div class="destination-rating">4.6 ★</div>
-                            </div>
-                            <p class="destination-description">Paraíso do ecoturismo com cachoeiras cristalinas e trilhas incríveis.</p>
-                            
-                            <div class="destination-details">
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="">
-                                    Pousadas: 80+
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="">
-                                    40 Cachoeiras
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=34&format=png&color=000000" alt="">
-                                    Melhor época: Mai-Set
-                                </div>
-                                <div class="detail-item">
-                                    <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="">
-                                    Custo médio: 4 dias
-                                </div>
-                            </div>
-                            
-                            <div class="destination-price">
-                                <div class="price-label">Preço médio por pessoa</div>
-                                <div class="price-value">R$ 800</div>
-                                <div class="price-period">para 4 dias</div>
-                            </div>
-                            
-                            <div class="destination-actions">
-                                <button class="btn-destination btn-details" onclick="window.location.href='viagem.php'">Ver Detalhes</button>
-                                <button class="btn-destination btn-create-group" onclick="window.location.href='grupos.php'">Criar Grupo</button>
                             </div>
                         </div>
                     </div>

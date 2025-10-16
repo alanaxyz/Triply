@@ -11,17 +11,16 @@ if (!is_dir(dirname($dbPath))) {
 try {
     $db = new PDO("sqlite:$dbPath");
 
-    // Configurações recomendadas
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Erros como exceções
-    $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); // Fetch associativo
-    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // Usa prepared statements reais
+    
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+    $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); 
+    $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); 
 
-    // Validação de conexão
-    // (executa uma query leve apenas para confirmar)
+   
     $db->query('SELECT 1');
 
 } catch (PDOException $e) {
-    // Log de erro — idealmente redirecionar para um handler central
+    
     error_log("Erro na conexão com SQLite: " . $e->getMessage());
     die("Falha ao conectar ao banco de dados.");
 }

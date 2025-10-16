@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('Este email já está cadastrado!'); window.location.href='register.php';</script>";
                 exit;
             } else {
-                // Inserir novo usuário - AJUSTADO para a estrutura da sua tabela
+                
                 $stmt = $db->prepare("INSERT INTO users (nome, data_nascimento, email, cpf, telefone, senha) VALUES (:nome, :data_nascimento, :email, :cpf, :telefone, :senha)");
                 
                 $dados = [
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':data_nascimento' => $data_nascimento,
                     ':email' => $email,
                     ':cpf' => $cpf,
-                    // No array $dados, antes de inserir:
+                   
                     ':telefone' => preg_replace('/\D/', '', $telefone), // Remove tudo que não é número
                     ':senha' => password_hash($senha, PASSWORD_DEFAULT)
                 ];

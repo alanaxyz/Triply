@@ -12,14 +12,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/grupo.css">
+    <link rel="stylesheet" href="../styles/grupo.css">
     <title>Criar Grupo</title>
 </head>
 <body>
      <nav class='navbar'>
         <a href="" class="logo">Triply</a>
         <span>
-            <a href="/home.php">Inicio</a>
+            <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/database/config.php'; // importa a conexão
+require __DIR__ . '/../database/config.php'; // importa a conexão
 
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';

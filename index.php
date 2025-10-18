@@ -16,10 +16,10 @@
     </a>
     
         <span>
-            <a href="sobre.php">Sobre</a>
+            <a href="pages/sobre.php">Sobre</a>
             <div class="register">
                 <img src="https://img.icons8.com/?size=100&id=Z6wAIySfvC7I&format=png&color=000000" alt="">
-                <a href="/register.php">Cadastre-se</a>
+                <a href="pages/register.php">Cadastre-se</a>
             </div>
         </span>
     </nav>
@@ -40,7 +40,7 @@
                                 <br><strong>Triply!</strong>
                             </h1>
                         </div>
-                    <form action="login.php" method="post">
+                    <form action="/pages/login.php" method="post">
                         <label for="email">Email</label>
                         <input type="text" id="email" name="email">
                         <label for="senha">Senha</label>
@@ -49,7 +49,7 @@
                         <span>
                             <button type ="submit" class="entrar">Entrar</button>
                             <p>Não possui cadastro?</p>
-                            <button type="button" onclick="window.location.href='register.php'" class="registro">Registre-se</button>
+                            <button type="button" onclick="window.location.href='pages/register.php'" class="registro">Registre-se</button>
                         </span>
                     </form>
                 </div>

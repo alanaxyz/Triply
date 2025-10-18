@@ -331,23 +331,19 @@ footer {
   color: #aaa;
   font-size: 14px;
 }
-
 .container {
-  width: 400px;
-  height: 400px;
-  position: relative;
-  left: 26%;
-  top: 42%;
-  transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .center {
   width: 180px;
   height: 60px;
   position: relative;
+  margin-top: 18%;
+
 }
 
 .btn {
@@ -362,7 +358,7 @@ footer {
   color: rgb(39, 68, 34);
 }
 
-svg {
+.btn svg {
   position: absolute;
   left: 0;
   top: 0;
@@ -382,10 +378,9 @@ svg {
   font-weight: 100;
 }
 
-.btn:hover {
-  transition: 1s ease-in-out;
-}
-
-.btn p{
-  margin-bottom: 30px;
+.btn p {
+  margin: 0;
+  line-height: 60px;
+ position: relative;
+ top: -15px;
 }

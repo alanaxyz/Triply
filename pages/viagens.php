@@ -5,11 +5,19 @@
         exit;
     }
     $usuario_nome = $_SESSION['usuario_nome'] ?? '';
-
-
+    // Verificar se há parâmetro de busca na URL
+    $search_term = '';
+    if (isset($_GET['search']) && !empty($_GET['search'])) {
+        $search_term = htmlspecialchars($_GET['search']);
+    }
+    // Verificar se há parâmetro de busca na URL
+    $search_term = '';
+    if (isset($_GET['search']) && !empty($_GET['search'])) {
+        $search_term = htmlspecialchars($_GET['search']);
+    }
 
 // Carregar o JSON com os destinos
-$json_data = file_get_contents('destinos.json');
+$json_data = file_get_contents('../scripts/destinos.json');
 $destinos = json_decode($json_data, true);
 
 // Função para determinar o tipo de viagem baseado no nome/local
@@ -107,14 +115,14 @@ function getImagemPadrao($tipo, $nome) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/viagens.css">
+    <link rel="stylesheet" href="../styles/viagens.css">
     <title>Destinos - Triply</title>
 </head>
 <body>
     <nav class='navbar'>
         <a href="" class="logo">Triply</a>
         <span>
-            <a href="/home.php">Inicio</a>
+            <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>
@@ -144,10 +152,10 @@ function getImagemPadrao($tipo, $nome) {
                     <h2 class="filters-title">Filtrar Destinos</h2>
                 </div>
                 <div class="filters-grid">
-                    <div class="filter-group">
-                        <label for="destination">Destino</label>
-                        <input type="text" id="destination" placeholder="Para onde você quer ir?">
-                    </div>
+                   <div class="filter-group">
+                    <label for="destination">Destino</label>
+                    <input type="text" id="destination" placeholder="Para onde você quer ir?" value="<?= $search_term ?>">
+                </div>
                     
                     <div class="filter-group">
                         <label for="type">Tipo de Viagem</label>
@@ -342,6 +350,17 @@ function getImagemPadrao($tipo, $nome) {
                 card.style.display = show ? 'block' : 'none';
             });
         }
+        // Preencher automaticamente o filtro e aplicar se houver termo de busca
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchTerm = "<?= $search_term ?>";
+            if (searchTerm) {
+                document.getElementById('destination').value = searchTerm;
+                // Aplicar filtros automaticamente
+                setTimeout(() => {
+                    applyFilters();
+                }, 100);
+            }
+        });
         
         function resetFilters() {
             document.getElementById('destination').value = '';

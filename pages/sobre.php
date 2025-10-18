@@ -1,7 +1,7 @@
 <?php
     session_start();
     if (!isset($_SESSION['usuario_id'])) {
-        header("Location: index.php");
+        header("Location: ../index.php");
         exit;
     }
     $usuario_nome = $_SESSION['usuario_nome'] ?? '';
@@ -11,15 +11,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles/sobre.css">
+    <link rel="stylesheet" href="../styles/sobre.css">
     <title>Sobre - Triply</title>
     
 </head>
 <body>
     <nav class='navbar'>
-        <a href="index.php" class="logo">Triply</a>
+        <a href="../index.php" class="logo">Triply</a>
         <span>
-            <a href="/home.php">Inicio</a>
+            <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>

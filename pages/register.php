@@ -1,6 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/database/config.php';
+require __DIR__ . '/../database/config.php'; // importa a conexão
 
 // Processar registro
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,14 +41,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':data_nascimento' => $data_nascimento,
                     ':email' => $email,
                     ':cpf' => $cpf,
-                   
                     ':telefone' => preg_replace('/\D/', '', $telefone), // Remove tudo que não é número
                     ':senha' => password_hash($senha, PASSWORD_DEFAULT)
                 ];
                 
                 if ($stmt->execute($dados)) {
-                    echo "<script>alert('Conta criada com sucesso! Faça login para continuar.'); window.location.href='index.php';</script>";
-                    exit;
+                    // Buscar o ID do usuário recém-criado
+                    $user_id = $db->lastInsertId();
+                    
+                    // Buscar os dados completos do usuário
+                    $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
+                    $stmt->execute([':id' => $user_id]);
+                    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($usuario) {
+                        // Criar sessão do usuário
+                        $_SESSION['usuario_id'] = $usuario['id'];
+                        $_SESSION['usuario_nome'] = $usuario['nome'];
+                        $_SESSION['usuario_email'] = $usuario['email'];
+                        
+                        echo "<script>alert('Conta criada com sucesso!'); window.location.href='home.php';</script>";
+                        exit;
+                    } else {
+                        echo "<script>alert('Conta criada, mas houve um problema no login automático. Faça login manualmente.'); window.location.href='index.php';</script>";
+                        exit;
+                    }
                 } else {
                     echo "<script>alert('Erro ao criar conta. Tente novamente.'); window.location.href='register.php';</script>";
                     exit;
@@ -67,12 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
-    <link rel="stylesheet" href="styles\register.css" class="css">
+    <link rel="stylesheet" href="../styles/register.css" class="css">
 
 </head>
 <body>
     <nav class='navbar'>
-    <a href="/index.php">
+    <a href="index.php">
         <p class="logo">Triply</p>
     </a>
     

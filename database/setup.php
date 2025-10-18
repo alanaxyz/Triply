@@ -26,7 +26,7 @@ try {
     echo "📊 Total de usuários cadastrados: " . $result['total'] . "<br>";
     
     echo "<br>🎉 Setup concluído com sucesso!";
-    echo "<br><a href='register.php'>Ir para página de registro</a>";
+    echo "<br><a href='../pages/register.php'>Ir para página de registro</a>";
     
 } catch (PDOException $e) {
     echo "❌ Erro durante o setup: " . $e->getMessage();

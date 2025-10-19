@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario_id'])) {
-    header("Location: index.php");
+    header("Location:  ../index.php");
     exit;
 }
 $usuario_nome = $_SESSION['usuario_nome'] ?? '';
@@ -113,7 +113,7 @@ function gerarDescricaoCurta($destino) {
 </head>
 <body>
     <nav class='navbar'>
-        <a href="" class="logo">Triply</a>
+        <a href="../index.php" class="logo">Triply</a>
         <span>
             <a href="">Inicio</a>
             <a href="sobre.php">Sobre</a>
@@ -121,20 +121,20 @@ function gerarDescricaoCurta($destino) {
             <a href="grupos.php">Grupos</a>
         </span>
         <span>
-    <div class="user-dropdown">
-        <div class="user-info" onclick="toggleDropdown()">
-            <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-            <p><?= $usuario_nome?></p>
-            <span class="dropdown-arrow">▼</span>
-        </div>
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="logout.php" class="dropdown-item logout-item">
-                <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
-                Sair
-            </a>
-        </div>
-    </div>
-</span>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown()">
+                    <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
+                    <p><?= $usuario_nome?></p>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="logout.php" class="dropdown-item logout-item">
+                        <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </span>
     </nav>
     <div class='main'>
         <div class="carousel-container">

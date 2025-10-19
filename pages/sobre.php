@@ -25,9 +25,18 @@
             <a href="grupos.php">Grupos</a>
         </span>
         <span>
-            <div class="login">
-                <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                <p><?= $usuario_nome?></p>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown()">
+                    <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
+                    <p><?= $usuario_nome?></p>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="logout.php" class="dropdown-item logout-item">
+                        <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
+                        Sair
+                    </a>
+                </div>
             </div>
         </span>
     </nav>
@@ -174,5 +183,39 @@
             <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
         </div>
     </footer>
+<script>
+    // Dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('active');
+            
+            // Criar overlay para fechar ao clicar fora
+            if (dropdown.classList.contains('active')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'dropdown-overlay';
+                overlay.onclick = closeDropdown;
+                document.body.appendChild(overlay);
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function closeDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.remove('active');
+            
+            const overlay = document.querySelector('.dropdown-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Fechar dropdown ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDropdown();
+            }
+        });
+</script>
 </body>
 </html>

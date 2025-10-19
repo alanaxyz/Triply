@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <nav class='navbar'>
-    <a href="index.php">
+    <a href="../index.php">
         <p class="logo">Triply</p>
     </a>
     

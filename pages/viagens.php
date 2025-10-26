@@ -120,8 +120,7 @@ function getImagemPadrao($tipo, $nome) {
 </head>
 <body>
     <nav class='navbar'>
-        <a href="../index.php" class="logo">Triply</a>
-        <span>
+    <a href="home.php" class="logo">Triply</a>        <span>
             <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
@@ -390,7 +389,7 @@ function getImagemPadrao($tipo, $nome) {
         
         function createGroup(destinationName) {
             // Redirecionar para criar grupo com o destino selecionado
-            window.location.href = 'criar_grupo.php?destino=' + encodeURIComponent(destinationName);
+            window.location.href = 'grupos.php';
         }
         
         // Aplicar filtros em tempo real

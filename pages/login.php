@@ -25,7 +25,7 @@ try {
         header("Location: home.php");
         exit;
     } else {
-        echo "<script>alert('E-mail ou senha incorretos!'); window.location.href='index.php';</script>";
+        echo "<script>alert('E-mail ou senha incorretos!'); window.location.href='../index.php';</script>";
     }
 } catch (PDOException $e) {
     echo "Erro: " . $e->getMessage();

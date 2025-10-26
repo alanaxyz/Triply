@@ -2,6 +2,50 @@
 session_start();
 require __DIR__ . '/../database/config.php'; // importa a conexão
 
+// Função para validar CPF
+function validarCPF($cpf) {
+    // Remove caracteres não numéricos
+    $cpf = preg_replace('/[^0-9]/', '', $cpf);
+    
+    // Verifica se tem 11 dígitos
+    if (strlen($cpf) != 11) {
+        return false;
+    }
+    
+    // Verifica se é uma sequência de dígitos repetidos
+    if (preg_match('/(\d)\1{10}/', $cpf)) {
+        return false;
+    }
+    
+    // Calcula o primeiro dígito verificador
+    $soma = 0;
+    for ($i = 0; $i < 9; $i++) {
+        $soma += $cpf[$i] * (10 - $i);
+    }
+    $resto = $soma % 11;
+    $digito1 = ($resto < 2) ? 0 : 11 - $resto;
+    
+    // Verifica o primeiro dígito verificador
+    if ($cpf[9] != $digito1) {
+        return false;
+    }
+    
+    // Calcula o segundo dígito verificador
+    $soma = 0;
+    for ($i = 0; $i < 10; $i++) {
+        $soma += $cpf[$i] * (11 - $i);
+    }
+    $resto = $soma % 11;
+    $digito2 = ($resto < 2) ? 0 : 11 - $resto;
+    
+    // Verifica o segundo dígito verificador
+    if ($cpf[10] != $digito2) {
+        return false;
+    }
+    
+    return true;
+}
+
 // Processar registro
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'] ?? '';
@@ -23,6 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($senha) < 6) {
         echo "<script>alert('A senha deve ter pelo menos 6 caracteres!'); window.location.href='register.php';</script>";
         exit;
+    } elseif (!validarCPF($cpf)) {
+        echo "<script>alert('CPF inválido!'); window.location.href='register.php';</script>";
+        exit;
     } else {
         try {
             // Verificar se email já existe
@@ -32,6 +79,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->fetch()) {
                 echo "<script>alert('Este email já está cadastrado!'); window.location.href='register.php';</script>";
                 exit;
+            }
+
+            // Verificar se CPF já existe
+            $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf);
+            $stmt = $db->prepare("SELECT id FROM users WHERE cpf = :cpf");
+            $stmt->execute([':cpf' => $cpf_limpo]);
+            
+            if ($stmt->fetch()) {
+                echo "<script>alert('Este CPF já está cadastrado!'); window.location.href='register.php';</script>";
+                exit;
             } else {
                 
                 $stmt = $db->prepare("INSERT INTO users (nome, data_nascimento, email, cpf, telefone, senha) VALUES (:nome, :data_nascimento, :email, :cpf, :telefone, :senha)");
@@ -40,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':nome' => $nome . ' ' . $sobrenome, // Junta nome e sobrenome
                     ':data_nascimento' => $data_nascimento,
                     ':email' => $email,
-                    ':cpf' => $cpf,
+                    ':cpf' => $cpf_limpo, // Salva apenas números
                     ':telefone' => preg_replace('/\D/', '', $telefone), // Remove tudo que não é número
                     ':senha' => password_hash($senha, PASSWORD_DEFAULT)
                 ];
@@ -127,6 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group">
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf" required maxlength="14" placeholder="000.000.000-00">
+                    <div class="cpf-hint">Digite um CPF válido</div>
                 </div>
 
                 <div class="form-group">
@@ -205,6 +263,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </footer>
      <script>
+        // Função para validar CPF no JavaScript
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            
+            if (cpf.length !== 11) return false;
+            
+            // Verifica se é uma sequência de dígitos repetidos
+            if (/^(\d)\1+$/.test(cpf)) return false;
+            
+            // Calcula primeiro dígito verificador
+            let soma = 0;
+            for (let i = 0; i < 9; i++) {
+                soma += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let resto = soma % 11;
+            let digito1 = resto < 2 ? 0 : 11 - resto;
+            
+            if (digito1 !== parseInt(cpf.charAt(9))) return false;
+            
+            // Calcula segundo dígito verificador
+            soma = 0;
+            for (let i = 0; i < 10; i++) {
+                soma += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            resto = soma % 11;
+            let digito2 = resto < 2 ? 0 : 11 - resto;
+            
+            return digito2 === parseInt(cpf.charAt(10));
+        }
+
         // Máscaras e validações
         document.getElementById('cpf').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -214,6 +302,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
             }
             e.target.value = value;
+            
+            // Validação em tempo real do CPF
+            const cpfLimpo = value.replace(/\D/g, '');
+            const cpfGroup = this.parentElement;
+            const cpfHint = cpfGroup.querySelector('.cpf-hint');
+            
+            if (cpfLimpo.length === 11) {
+                if (validarCPF(value)) {
+                    cpfGroup.classList.remove('error');
+                    cpfGroup.classList.add('success');
+                    cpfHint.textContent = 'CPF válido';
+                    cpfHint.style.color = 'green';
+                    cpfHint.style.fontSize = '1em';
+                    cpfHint.style.marginTop = '2px';
+                } else {
+                    cpfGroup.classList.remove('success');
+                    cpfGroup.classList.add('error');
+                    cpfHint.textContent = 'CPF inválido';
+                    cpfHint.style.color = 'red';
+                    cpfHint.style.fontSize = '1em';
+                    cpfHint.style.marginTop = '2px';
+                }
+            } else {
+                cpfGroup.classList.remove('error', 'success');
+                cpfHint.textContent = 'Digite um CPF válido';
+                cpfHint.style.color = '';
+                cpfHint.style.fontSize = '1em';
+            }
         });
 
         document.getElementById('telefone').addEventListener('input', function(e) {
@@ -229,7 +345,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             const senha = document.getElementById('senha').value;
             const confirmarSenha = document.getElementById('confirmar-senha').value;
-            const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+            const cpf = document.getElementById('cpf').value;
+            const cpfLimpo = cpf.replace(/\D/g, '');
             
             // Limpar estados anteriores
             document.querySelectorAll('.form-group').forEach(group => {
@@ -249,9 +366,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 isValid = false;
             }
 
-            // Validação básica de CPF
-            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+            // Validação de CPF
+            if (!validarCPF(cpf)) {
                 document.getElementById('cpf').parentElement.classList.add('error');
+                document.getElementById('cpf').parentElement.querySelector('.cpf-hint').textContent = 'CPF inválido';
+                document.getElementById('cpf').parentElement.querySelector('.cpf-hint').style.color = 'red';
                 isValid = false;
             }
 
@@ -285,6 +404,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     this.parentElement.classList.remove('success');
                 }
             });
+        });
+
+        // Validação de data de nascimento (mínimo 12 anos)
+        document.getElementById('date').addEventListener('change', function() {
+            const dataNascimento = new Date(this.value);
+            const hoje = new Date();
+            const idade = hoje.getFullYear() - dataNascimento.getFullYear();
+            const mes = hoje.getMonth() - dataNascimento.getMonth();
+            
+            if (mes < 0 || (mes === 0 && hoje.getDate() < dataNascimento.getDate())) {
+                idade--;
+            }
+            
+            if (idade < 12) {
+                this.parentElement.classList.add('error');
+                alert('Você deve ter pelo menos 12 anos para se cadastrar');
+                this.value = '';
+            }
         });
     </script>
 </body>

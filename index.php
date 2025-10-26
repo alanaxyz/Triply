@@ -16,7 +16,6 @@
     </a>
     
         <span>
-            <a href="pages/sobre.php">Sobre</a>
             <div class="register">
                 <img src="https://img.icons8.com/?size=100&id=Z6wAIySfvC7I&format=png&color=000000" alt="">
                 <a href="pages/register.php">Cadastre-se</a>

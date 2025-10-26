@@ -275,6 +275,8 @@ body{
             border: 2px solid var(--light-gray);
             border-radius: 8px;
             transition: var(--transition);
+            text-transform: uppercase;
+
         }
         
         .code-inputs input:focus {
@@ -319,14 +321,19 @@ body{
         .divider span {
             padding: 0 15px;
         }
-        
+
+        .groups-header{
+            display: flex;
+            justify-content: end;
+            margin-bottom: 5%;
+        }
+
         .create-group-btn {
             background-color: var(--secondary);
             color: var(--dark);
             padding: 12px 30px;
             border-radius: 50px;
             font-weight: 600;
-            width: 100%;
         }
         
         .create-group-btn:hover {
@@ -580,15 +587,35 @@ body{
         from { opacity: 0; }
         to { opacity: 1; }
     }
+    .groups-header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
     
+    .join-existing-btn {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .join-existing-btn:hover {
+        background-color: #5a6268;
+    }
+
     .modal-content {
         background: white;
         padding: 15px 30px;
         border-radius: 16px;
         width: 90%;
+        margin: auto;
+        margin-top: 2%;
         max-width: 420px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        position: relative;
         animation: slideUp 0.3s ease;
     }
     

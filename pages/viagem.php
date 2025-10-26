@@ -148,8 +148,7 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
 </head>
 <body>
     <nav class='navbar'>
-        <a href="../index.php" class="logo">Triply</a>
-        <span>
+    <a href="home.php" class="logo">Triply</a>        <span>
             <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>

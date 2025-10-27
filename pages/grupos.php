@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Se for entrada em grupo por código
     if (isset($_POST['codigo_grupo'])) {
-        $codigo = trim($_POST['codigo_grupo']);
+        $codigo = strtoupper(trim($_POST['codigo_grupo']));
         
         try {
             // Buscar grupo pelo código

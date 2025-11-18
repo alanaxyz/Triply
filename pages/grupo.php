@@ -18,10 +18,79 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $grupo_id = $_GET['id'];
 
-// Função para buscar imagem do destino no JSON
+// Processar contribuição
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'contribuir') {
+    try {
+        $valor = floatval($_POST['valor']);
+        $observacao = $_POST['observacao'] ?? '';
+        
+        // Validar valor
+        if ($valor < 1 || $valor > 10000) {
+            throw new Exception("Valor deve estar entre R$ 1,00 e R$ 10.000,00");
+        }
+        
+        // Verificar se o usuário é membro do grupo
+        $stmt_membro = $db->prepare("
+            SELECT 1 FROM usuario_grupo 
+            WHERE usuario_id = ? AND grupo_id = ?
+        ");
+        $stmt_membro->execute([$usuario_id, $grupo_id]);
+        
+        if (!$stmt_membro->fetch()) {
+            throw new Exception("Você não é membro deste grupo");
+        }
+        
+        // Inserir contribuição no banco
+        $stmt_contribuicao = $db->prepare("
+            INSERT INTO contribuicoes (grupo_id, usuario_id, valor)
+            VALUES (?, ?, ?)
+        ");
+        
+        $stmt_contribuicao->execute([
+            $grupo_id,
+            $usuario_id,
+            $valor
+        ]);
+        
+        // Registrar atividade
+        $descricao_atividade = "contribuiu com R$ " . number_format($valor, 2, ',', '.') . 
+                              ($observacao ? " - " . htmlspecialchars($observacao) : "");
+        
+        $stmt_atividade = $db->prepare("
+            INSERT INTO atividades (grupo_id, usuario_id, tipo, descricao)
+            VALUES (?, ?, 'contribuicao', ?)
+        ");
+        
+        $stmt_atividade->execute([
+            $grupo_id,
+            $usuario_id,
+            $descricao_atividade
+        ]);
+        
+        // Mensagem de sucesso
+        $_SESSION['contribuicao_sucesso'] = true;
+        
+        // Redirecionar para evitar reenvio do formulário
+        header("Location: grupo.php?id=" . $grupo_id);
+        exit;
+        
+    } catch (Exception $e) {
+        error_log("Erro ao processar contribuição: " . $e->getMessage());
+        $_SESSION['erro_contribuicao'] = $e->getMessage();
+    }
+}
+
+// Verificar se há mensagens de sucesso ou erro
+$contribuicao_sucesso = $_SESSION['contribuicao_sucesso'] ?? false;
+$erro_contribuicao = $_SESSION['erro_contribuicao'] ?? null;
+
+// Limpar mensagens da sessão
+unset($_SESSION['contribuicao_sucesso']);
+unset($_SESSION['erro_contribuicao']);
+
 // Função para buscar imagem do destino no JSON
 function buscarImagemDestino($destino) {
-    $caminho_json = '../scripts/destinos.json'; // Ajuste o caminho conforme necessário
+    $caminho_json = '../scripts/destinos.json';
     
     if (!file_exists($caminho_json)) {
         return "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80";
@@ -47,7 +116,7 @@ function buscarImagemDestino($destino) {
             $palavras_json = explode(' ', $nome_destino_normalizado);
             
             foreach ($palavras_destino as $palavra) {
-                if (strlen($palavra) > 2) { // Só considerar palavras com mais de 2 caracteres
+                if (strlen($palavra) > 2) {
                     foreach ($palavras_json as $palavra_json) {
                         if (strpos($palavra_json, $palavra) !== false || strpos($palavra, $palavra_json) !== false) {
                             return $destino_data['imagem'] ?? "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80";
@@ -70,7 +139,7 @@ function buscarImagemDestino($destino) {
 
 // Função para normalizar texto (remover acentos e caracteres especiais)
 function normalizarTexto($texto) {
-    // Converter para minúsculas (usando strtolower em vez de mb_strtolower)
+    // Converter para minúsculas
     $texto = strtolower($texto);
     
     // Remover acentos usando uma abordagem mais compatível
@@ -173,29 +242,44 @@ try {
     <title><?= htmlspecialchars($grupo['nome_grupo']) ?> - Triply</title>
 </head>
 <body>
-     <nav class='navbar'>
-    <a href="home.php" class="logo">Triply</a>        <span>
+    <nav class='navbar'>
+    <a href="home.php" class="logo">Triply</a>
+    
+    <!-- Menu Hamburger para Mobile -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <!-- Links de Navegação -->
+    <div class="nav-links" id="navLinks">
+        <span class="nav-main-links">
             <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>
         </span>
-        <span>
-            <div class="user-dropdown">
-                <div class="user-info" onclick="toggleDropdown()">
-                    <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                    <p><?= htmlspecialchars($usuario_nome) ?></p>
-                    <span class="dropdown-arrow">▼</span>
+    
+    </div>
+    <div class="nav-links" id="navLinks">
+        <span class="nav-user-section">
+                <div class="user-dropdown">
+                    <div class="user-info" onclick="toggleDropdown()">
+                        <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
+                        <p><?= htmlspecialchars($usuario_nome) ?></p>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="logout.php" class="dropdown-item logout-item">
+                            <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
+                            Sair
+                        </a>
+                    </div>
                 </div>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="logout.php" class="dropdown-item logout-item">
-                        <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
-                        Sair
-                    </a>
-                </div>
-            </div>
-        </span>
-    </nav>
+            </span>
+    </div>
+</nav>
 
     <!-- Cabeçalho do Grupo -->
     <div class="group-header">
@@ -225,8 +309,6 @@ try {
             </div>
         </div>
     </div>
-
-    <!-- Resto do código permanece igual... -->
 
     <!-- Conteúdo Principal -->
     <main class="main-content">
@@ -302,14 +384,14 @@ try {
                             
                             <!-- Espaços vazios para novos membros -->
                             <?php for ($i = count($membros); $i < $grupo['numero_maximo_membros']; $i++): ?>
-                                <div class="member-card" style="background-color: var(--light-gray); opacity: 0.7;">
-                                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--gray); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                                <div class="member-card" style="background-color: #f8f9fa; opacity: 0.7;">
+                                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #666; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
                                         <svg viewBox="0 0 24 24" width="30" height="30" fill="white">
                                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                                         </svg>
                                     </div>
                                     <div style="font-weight: 600;">Vaga disponível</div>
-                                    <div style="font-size: 12px; color: var(--gray);">Convide alguém</div>
+                                    <div style="font-size: 12px; color: #666;">Convide alguém</div>
                                 </div>
                             <?php endfor; ?>
                         </div>
@@ -402,7 +484,7 @@ try {
                             </li>
                             <li class="info-item">
                                 <span class="info-label">Status:</span>
-                                <span class="info-value" style="color: var(--secondary); font-weight: 600;">Ativo</span>
+                                <span class="info-value" style="color: #59a55f; font-weight: 600;">Ativo</span>
                             </li>
                             <?php if (!empty($grupo['descricao'])): ?>
                             <li class="info-item">
@@ -427,6 +509,58 @@ try {
             </div>
         </div>
     </main>
+
+    <!-- Modal de Contribuição -->
+    <div id="modalContribuicao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Fazer Contribuição</h2>
+                <button class="close-modal" onclick="fecharModalContribuicao()">&times;</button>
+            </div>
+            
+            <div id="successMessage" class="success-message">
+                Contribuição realizada com sucesso!
+            </div>
+            
+            <form id="formContribuicao" method="POST">
+                <input type="hidden" name="grupo_id" value="<?= $grupo_id ?>">
+                <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+                <input type="hidden" name="acao" value="contribuir">
+                
+                <div class="form-group">
+                    <label for="valor">Valor da Contribuição (R$)</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">R$</span>
+                        <input type="number" 
+                               id="valor" 
+                               name="valor" 
+                               class="form-control" 
+                               min="1" 
+                               max="10000" 
+                               step="0.01"
+                               placeholder="0,00"
+                               required>
+                    </div>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Valor mínimo: R$ 1,00 | Valor máximo: R$ 10.000,00
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="observacao">Observação (opcional)</label>
+                    <textarea id="observacao" 
+                              name="observacao" 
+                              class="form-control" 
+                              rows="3" 
+                              placeholder="Alguma observação sobre esta contribuição..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    Confirmar Contribuição
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -473,11 +607,143 @@ try {
     </footer>
 
     <script>
-        // Funções para os modais
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const mobileOverlay = document.createElement('div');
+
+        mobileOverlay.className = 'mobile-overlay';
+        document.body.appendChild(mobileOverlay);
+      
+        //faz o menu aparecer
+    menuToggle.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        mobileOverlay.classList.toggle('active');
+        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+     });
+        //  faz o menu sumir
+    mobileOverlay.addEventListener('click', function() {
+        navLinks.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Fechar menu ao clicar em um link (mobile)
+    const navLinksItems = document.querySelectorAll('.nav-main-links a');
+    navLinksItems.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+
+    // Dropdown functionality (atualizada)
+    function toggleDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        dropdown.classList.toggle('active');
+        
+        if (window.innerWidth <= 768) {
+            // No mobile, o dropdown fica sempre visível quando ativo
+            return;
+        }
+        
+        // Para desktop - comportamento original
+        if (dropdown.classList.contains('active')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'dropdown-overlay';
+            overlay.onclick = closeDropdown;
+            document.body.appendChild(overlay);
+        } else {
+            closeDropdown();
+        }
+    }
+
+    function closeDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        dropdown.classList.remove('active');
+        
+        const overlay = document.querySelector('.dropdown-overlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    }
+
+    // Fechar dropdown ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDropdown();
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // Fechar menu ao redimensionar a janela para desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navLinks.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+        // Funções do Modal de Contribuição
         function abrirModalContribuicao() {
-            alert('Funcionalidade de contribuição será implementada em breve!');
+            const modal = document.getElementById('modalContribuicao');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Resetar formulário
+            document.getElementById('formContribuicao').reset();
+            document.getElementById('successMessage').style.display = 'none';
         }
 
+        function fecharModalContribuicao() {
+            const modal = document.getElementById('modalContribuicao');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalContribuicao');
+            if (event.target === modal) {
+                fecharModalContribuicao();
+            }
+        }
+
+        // Validação do formulário
+        document.getElementById('formContribuicao').addEventListener('submit', function(e) {
+            const valor = parseFloat(document.getElementById('valor').value);
+            const btnSubmit = document.getElementById('btnSubmit');
+            
+            if (!valor || valor < 1 || valor > 10000) {
+                e.preventDefault();
+                alert('Por favor, insira um valor entre R$ 1,00 e R$ 10.000,00');
+                return;
+            }
+            
+            // Mostrar loading
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Processando...';
+            btnSubmit.classList.add('loading');
+        });
+
+        // Formatação do valor em tempo real
+        document.getElementById('valor').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            
+            if (value.length > 2) {
+                value = value.replace(/(\d+)(\d{2})/, '$1.$2');
+            }
+            
+            e.target.value = value;
+        });
+
+        // Funções para os outros modais
         function abrirModalConvite() {
             alert('Funcionalidade de convite será implementada em breve!');
         }
@@ -549,6 +815,56 @@ try {
             
             updateProgress(<?= $total_arrecadado ?>, <?= $grupo['orcamento_total'] ?>);
         });
+
+        // Mostrar mensagem de sucesso se houver
+        <?php if ($contribuicao_sucesso): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = document.createElement('div');
+            successMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                color: #155724;
+                padding: 15px 20px;
+                border-radius: 8px;
+                border: 1px solid #c3e6cb;
+                z-index: 1001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            `;
+            successMessage.textContent = '✅ Contribuição realizada com sucesso!';
+            document.body.appendChild(successMessage);
+            
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
+        });
+        <?php endif; ?>
+
+        // Mostrar mensagem de erro se houver
+        <?php if ($erro_contribuicao): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = document.createElement('div');
+            errorMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f8d7da;
+                color: #721c24;
+                padding: 15px 20px;
+                border-radius: 8px;
+                border: 1px solid #f5c6cb;
+                z-index: 1001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            `;
+            errorMessage.textContent = '❌ <?= addslashes($erro_contribuicao) ?>';
+            document.body.appendChild(errorMessage);
+            
+            setTimeout(() => {
+                errorMessage.remove();
+            }, 5000);
+        });
+        <?php endif; ?>
     </script>
 </body>
 </html>

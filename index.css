@@ -551,6 +551,9 @@ footer {
         width: 90%;
         margin: 20px auto;
     }
+    .main-text{
+        display: none;
+    }
     
     .card-inicio {
         width: 100%;
@@ -581,6 +584,9 @@ footer {
     
     .main-2 span h1, .main-3 span h1, .main-4 span h1 {
         font-size: 2em;
+    }
+    .main-text{
+        display: none;
     }
     .card-inicio-container section{
       flex-wrap: wrap;

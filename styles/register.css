@@ -203,11 +203,13 @@ a{
   border-color: #10B981;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 968px) {
   .card {
       padding: 2rem 1.5rem;
   }
-  
+  .navbar .login{
+    display: none;
+  }
   .form-grid {
       grid-template-columns: 1fr;
       gap: 0;
@@ -221,6 +223,9 @@ a{
 @media (max-width: 380px) {
   .card {
       padding: 1.5rem 1rem;
+  }
+  .navbar .login{
+    display: none;
   }
   
   .logo-text {

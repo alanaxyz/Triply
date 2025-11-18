@@ -90,7 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('Este CPF já está cadastrado!'); window.location.href='register.php';</script>";
                 exit;
             } else {
-                
+                $options = [
+                    'cost' => 12, // Custo do algoritmo bcrypt
+                ];
                 $stmt = $db->prepare("INSERT INTO users (nome, data_nascimento, email, cpf, telefone, senha) VALUES (:nome, :data_nascimento, :email, :cpf, :telefone, :senha)");
                 
                 $dados = [
@@ -99,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':email' => $email,
                     ':cpf' => $cpf_limpo, // Salva apenas números
                     ':telefone' => preg_replace('/\D/', '', $telefone), // Remove tudo que não é número
-                    ':senha' => password_hash($senha, PASSWORD_DEFAULT)
+                    ':senha' => password_hash($senha, PASSWORD_DEFAULT, $options)
                 ];
                 
                 if ($stmt->execute($dados)) {

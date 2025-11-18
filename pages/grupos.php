@@ -194,30 +194,44 @@ $tem_grupos = !empty($grupos_usuario);
     <title>Grupos</title>
 </head>
 <body>
-    <nav class='navbar'>
-            <a href="home.php" class="logo">Triply</a>
-        <span>
+   <nav class='navbar'>
+    <a href="home.php" class="logo">Triply</a>
+    
+    <!-- Menu Hamburger para Mobile -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <!-- Links de Navegação -->
+    <div class="nav-links" id="navLinks">
+        <span class="nav-main-links">
             <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>
         </span>
-        <span>
-            <div class="user-dropdown">
-                <div class="user-info" onclick="toggleDropdown()">
-                    <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                    <p><?= htmlspecialchars($usuario_nome) ?></p>
-                    <span class="dropdown-arrow">▼</span>
+        
+    </div>
+    <div class="nav-links" id="navLinks">
+        <span class="nav-user-section">
+                <div class="user-dropdown">
+                    <div class="user-info" onclick="toggleDropdown()">
+                        <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
+                        <p><?= htmlspecialchars($usuario_nome) ?></p>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="logout.php" class="dropdown-item logout-item">
+                            <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
+                            Sair
+                        </a>
+                    </div>
                 </div>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="logout.php" class="dropdown-item logout-item">
-                        <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
-                        Sair
-                    </a>
-                </div>
-            </div>
-        </span>
-    </nav>
+            </span>
+    </div>
+</nav>
 
     <!-- Conteúdo Principal -->
     <main class="main-content">
@@ -273,6 +287,16 @@ $tem_grupos = !empty($grupos_usuario);
                             $stmt_membros->execute([$grupo['id']]);
                             $membros = $stmt_membros->fetch();
                             $total_membros = $membros['total_membros'];
+                            
+                            // Buscar total arrecadado do grupo
+                            $stmt_arrecadado = $db->prepare("SELECT COALESCE(SUM(valor), 0) as total_arrecadado FROM contribuicoes WHERE grupo_id = ?");
+                            $stmt_arrecadado->execute([$grupo['id']]);
+                            $arrecadado = $stmt_arrecadado->fetch();
+                            $total_arrecadado = $arrecadado['total_arrecadado'];
+                            
+                            // Calcular porcentagem do progresso
+                            $porcentagem = $grupo['orcamento_total'] > 0 ? 
+                                round(($total_arrecadado / $grupo['orcamento_total']) * 100) : 0;
                         ?>
                             <div class="group-card">
                                 <div class="group-image-placeholder">
@@ -294,17 +318,13 @@ $tem_grupos = !empty($grupos_usuario);
                                     <div class="group-progress">
                                         <div class="progress-label">
                                             <span>Cofre do grupo</span>
-                                            <span>R$ 0,00 / R$ <?= number_format($grupo['orcamento_total'], 2, ',', '.') ?></span>
+                                            <span>R$ <?= number_format($total_arrecadado, 2, ',', '.') ?> / R$ <?= number_format($grupo['orcamento_total'], 2, ',', '.') ?></span>
                                         </div>
                                         <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 0%"></div>
+                                            <div class="progress-fill" style="width: <?= $porcentagem ?>%"></div>
                                         </div>
+                                        <div class="progress-percentage"><?= $porcentagem ?>% concluído</div>
                                     </div>
-                                    <?php if (!empty($grupo['descricao'])): ?>
-                                        <div class="group-description">
-                                            <p><?= htmlspecialchars($grupo['descricao']) ?></p>
-                                        </div>
-                                    <?php endif; ?>
                                     <div class="group-actions">
                                         <button class="btn-outline" onclick="viewGroupDetails(<?= $grupo['id'] ?>)">Detalhes</button>
                                         <button class="btn-primary" onclick="window.location.href='grupo.php?id=<?= $grupo['id'] ?>'">Entrar</button>
@@ -397,6 +417,88 @@ $tem_grupos = !empty($grupos_usuario);
     </div>
 
     <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const mobileOverlay = document.createElement('div');
+
+        
+        mobileOverlay.className = 'mobile-overlay';
+        document.body.appendChild(mobileOverlay);
+        menuToggle.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        mobileOverlay.classList.toggle('active');
+        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+    });
+
+    mobileOverlay.addEventListener('click', function() {
+        navLinks.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Fechar menu ao clicar em um link (mobile)
+    const navLinksItems = document.querySelectorAll('.nav-main-links a');
+    navLinksItems.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+
+    // Dropdown functionality (atualizada)
+    function toggleDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        dropdown.classList.toggle('active');
+        
+        if (window.innerWidth <= 768) {
+            // No mobile, o dropdown fica sempre visível quando ativo
+            return;
+        }
+        
+        // Para desktop - comportamento original
+        if (dropdown.classList.contains('active')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'dropdown-overlay';
+            overlay.onclick = closeDropdown;
+            document.body.appendChild(overlay);
+        } else {
+            closeDropdown();
+        }
+    }
+
+    function closeDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        dropdown.classList.remove('active');
+        
+        const overlay = document.querySelector('.dropdown-overlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    }
+
+    // Fechar dropdown ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDropdown();
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // Fechar menu ao redimensionar a janela para desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navLinks.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
         // Função para abrir o modal de criação de grupo
         function openCreateGroupModal() {
             document.getElementById('createGroupModal').style.display = 'block';

@@ -113,28 +113,42 @@ function gerarDescricaoCurta($destino) {
 </head>
 <body>
     <nav class='navbar'>
-    <a href="home.php" class="logo">Triply</a>        <span>
-            <a href="">Inicio</a>
+    <a href="home.php" class="logo">Triply</a>
+    
+    <!-- Menu Hamburger para Mobile -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <!-- Links de Navegação -->
+    <div class="nav-links" id="navLinks">
+        <span class="nav-main-links">
+            <a href="home.php">Inicio</a>
             <a href="sobre.php">Sobre</a>
             <a href="viagens.php">Viagens</a>
             <a href="grupos.php">Grupos</a>
         </span>
-        <span>
-            <div class="user-dropdown">
-                <div class="user-info" onclick="toggleDropdown()">
-                    <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
-                    <p><?= $usuario_nome?></p>
-                    <span class="dropdown-arrow">▼</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <span class="nav-user-section">
+                <div class="user-dropdown">
+                    <div class="user-info" onclick="toggleDropdown()">
+                        <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
+                        <p><?= htmlspecialchars($usuario_nome) ?></p>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="logout.php" class="dropdown-item logout-item">
+                            <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
+                            Sair
+                        </a>
+                    </div>
                 </div>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="logout.php" class="dropdown-item logout-item">
-                        <img src="https://img.icons8.com/?size=100&id=2444&format=png&color=000000" alt="" class="dropdown-icon">
-                        Sair
-                    </a>
-                </div>
-            </div>
-        </span>
-    </nav>
+            </span>
+    </div>
+</nav>
     <div class='main'>
         <div class="carousel-container">
             <div class="carousel">
@@ -218,73 +232,110 @@ function gerarDescricaoCurta($destino) {
     </footer>
 
     <script>
-        // Carrossel automático
-        let currentIndex = 0;
-        const images = document.querySelectorAll('.carousel-images img');
-        const totalImages = images.length;
+        // Menu Mobile
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+const mobileOverlay = document.createElement('div');
 
-        function showNextImage() {
-            currentIndex = (currentIndex + 1) % totalImages;
-            updateCarousel();
+mobileOverlay.className = 'mobile-overlay';
+document.body.appendChild(mobileOverlay);
+
+menuToggle.addEventListener('click', function() {
+    navLinks.classList.toggle('active');
+    mobileOverlay.classList.toggle('active');
+    document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+});
+
+mobileOverlay.addEventListener('click', function() {
+    navLinks.classList.remove('active');
+    mobileOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+});
+
+// Carrossel automático
+let currentIndex = 0;
+const images = document.querySelectorAll('.carousel-images img');
+const totalImages = images.length;
+
+function showNextImage() {
+    currentIndex = (currentIndex + 1) % totalImages;
+    updateCarousel();
+}
+
+function updateCarousel() {
+    const carousel = document.getElementById('carousel');
+    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+}
+
+// Mudar imagem a cada 5 segundos
+setInterval(showNextImage, 5000);
+
+// Função de busca
+function searchDestination() {
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    if (searchTerm) {
+        window.location.href = 'viagens.php?search=' + encodeURIComponent(searchTerm);
+    } else {
+        window.location.href = 'viagens.php';
+    }
+}
+
+// Permitir busca com Enter
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchDestination();
+    }
+});
+
+// Dropdown functionality
+function toggleDropdown() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('active');
+    
+    if (window.innerWidth <= 768) {
+        return;
+    }
+    
+    if (dropdown.classList.contains('active')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'dropdown-overlay';
+        overlay.onclick = closeDropdown;
+        document.body.appendChild(overlay);
+    } else {
+        closeDropdown();
+    }
+}
+
+function closeDropdown() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.remove('active');
+    
+    const overlay = document.querySelector('.dropdown-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+// Fechar menu ao redimensionar para desktop
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        navLinks.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+});
+
+// Fechar dropdown ao pressionar ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDropdown();
+        if (window.innerWidth <= 768) {
+            navLinks.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
         }
-
-        function updateCarousel() {
-            const carousel = document.getElementById('carousel');
-            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
-
-        // Mudar imagem a cada 5 segundos
-        setInterval(showNextImage, 5000);
-
-       // Função de busca
-        function searchDestination() {
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            if (searchTerm) {
-                window.location.href = 'viagens.php?search=' + encodeURIComponent(searchTerm);
-            } else {
-                window.location.href = 'viagens.php';
-            }
-        }
-
-        // Permitir busca com Enter
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchDestination();
-            }
-        });
-
-        // Dropdown functionality
-        function toggleDropdown() {
-            const dropdown = document.querySelector('.user-dropdown');
-            dropdown.classList.toggle('active');
-            
-            // Criar overlay para fechar ao clicar fora
-            if (dropdown.classList.contains('active')) {
-                const overlay = document.createElement('div');
-                overlay.className = 'dropdown-overlay';
-                overlay.onclick = closeDropdown;
-                document.body.appendChild(overlay);
-            } else {
-                closeDropdown();
-            }
-        }
-
-        function closeDropdown() {
-            const dropdown = document.querySelector('.user-dropdown');
-            dropdown.classList.remove('active');
-            
-            const overlay = document.querySelector('.dropdown-overlay');
-            if (overlay) {
-                overlay.remove();
-            }
-        }
-
-        // Fechar dropdown ao pressionar ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDropdown();
-            }
-        });
+    }
+});
     </script>
 </body>
 </html>

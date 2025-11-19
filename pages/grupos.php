@@ -395,6 +395,7 @@ $tem_grupos = !empty($grupos_usuario);
                 </div>
             </form>
         </div>
+
     </div>
 
     <!-- Modal para entrar em grupo existente -->

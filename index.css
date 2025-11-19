@@ -35,7 +35,7 @@ a {
 }
 
 .navbar {
-    width: 100%;
+    width: 97,5%;
     min-height: 90px;
     display: flex;
     align-items: center;
@@ -82,6 +82,8 @@ a {
 .main-container {
     width: 100%;
     height: auto;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
 }
 
@@ -98,8 +100,8 @@ a {
 }
 
 .main-form {
+    align-content: center;
     color: white;
-    position: relative;
     width: 90%;
     max-width: 400px;
     height: auto;
@@ -118,12 +120,10 @@ a {
 }
 
 .main-form form {
-    position: relative;
-    top: 0;
+    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    left: 0;
     width: 100%;
 }
 
@@ -171,9 +171,7 @@ a {
 
 .form-text {
     text-align: center;
-    position: relative;
-    top: 0;
-    margin: 20px 0;
+    margin:20% 0 0 0;
 }
 
 .main-effect {
@@ -191,6 +189,9 @@ a {
     align-items: center;
     justify-content: center;
 }
+.content-container{
+    margin: auto;
+}
 
 .main-2, .main-3, .main-4 {
     display: flex;
@@ -199,11 +200,10 @@ a {
     text-align: center;
     height: auto;
     min-height: 100vh;
-    position: relative;
+    margin: auto;
 }
 
 .main-2 span, .main-3 span, .main-4 span {
-    position: relative;
     top: 0;
     padding: 40px 20px;
     display: flex;
@@ -249,8 +249,9 @@ a {
 }
 
 .main-conteinar-text-2, .main-conteinar-text-3, .main-conteinar-text-4 {
-    position: static;
-    padding: 40px 20px;
+    height: 10%;
+    padding-top: 3%;
+    margin: 5% 0;
     text-align: center;
 }
 
@@ -444,23 +445,13 @@ footer {
     }
     
     .main-conteinar-text-2, .main-conteinar-text-3, .main-conteinar-text-4 {
-        position: absolute;
         text-align: center;
         margin-top: 30px;
         
     }
 
     .main-conteinar-text-2 {
-        left: 59%;
         font-size: 3em;
-    }
-    
-    .main-conteinar-text-3 {
-        left: 10%;
-    }
-    
-    .main-conteinar-text-4 {
-        right: 10%;
     }
     
     .navbar span {
@@ -483,7 +474,6 @@ footer {
     .main-form form {
         top: 25%;
         left: 15%;
-        align-items: flex-start;
     }
     
     .main-form form input, .main-form form button {

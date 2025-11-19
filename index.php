@@ -55,82 +55,87 @@
        </div>
        <div class="main-container main-2">
         <img src="src\saoluis.jpg" alt="">
-             <h1 class="main-conteinar-text-2">
-                    <strong>Veja, planeje e viaje</strong>
-                </h1>
-            <section class="card-inicio-container">
-                    <section>
-                        <div class="card-inicio">
-                            <h1>Veja</h1>
-                                <p>Explore destinos incriveis com fotos
-                                    descrições e dicas exclusivas.
-                                </p>
-                        </div>
-                        <div class="card-inicio card-destaque-2">
-                            <h1>Planeje</h1>
-                            <p>
-                            A diversão começa no planejamento, descubra lugares novos e experiências únicas com seus amigos.
-                        </p>
-                        </div>
-                        <div class="card-inicio">
-                            <h1>Viaje</h1>
-                            <p>
-                                Transforme seus planos em realidade e viva experiências
-                                unicas ao redor do Brasil.
+            <div class="content-container">
+                <h1 class="main-conteinar-text-2">
+                        <strong>Veja, planeje e viaje</strong>
+                    </h1>
+                <section class="card-inicio-container">
+                        <section>
+                            <div class="card-inicio">
+                                <h1>Veja</h1>
+                                    <p>Explore destinos incriveis com fotos
+                                        descrições e dicas exclusivas.
+                                    </p>
+                            </div>
+                            <div class="card-inicio card-destaque-2">
+                                <h1>Planeje</h1>
+                                <p>
+                                A diversão começa no planejamento, descubra lugares novos e experiências únicas com seus amigos.
                             </p>
-                        </div>
-                    </section>
+                            </div>
+                            <div class="card-inicio">
+                                <h1>Viaje</h1>
+                                <p>
+                                    Transforme seus planos em realidade e viva experiências
+                                    unicas ao redor do Brasil.
+                                </p>
+                            </div>
+                        </section>
+            </div>
             </section>
        </div>
        <div class="main-container main-3">
             <img src="src\balneario.webp" alt="">
 
-             <section class="main-conteinar-text-3">
-                 <h1>
-                    <strong>Forme grupos <br> com seus amigos</strong>
-                </h1>
-               
-             </section>
-            <section class="card-inicio-container">
-                
-                <div class="card-inicio ">
-                    <h1>Crie um grupo</h1>
-                    <p>Junte seus amigos em um só lugar para organizar a próxima viagem de forma prática e divertida</p>
-                </div>
-                <div class="card-inicio card-destaque-3">
-                    <h1>Convide Amigos</h1>
-                    <p>Envie convites e traga quem você quiser para participar do planejamento junto com você</p>
-                </div>
-                <div class="card-inicio">
-                    <h1>Compartilhe planos</h1>
-                    <p>Defina destinos, hospedagens e passeios em grupo, deixando tudo transparente e colaborativo</p>
-                </div>
+             <div class="content-container">
+                 <section class="main-conteinar-text-3">
+                     <h1>
+                        <strong>Forme grupos <br> com seus amigos</strong>
+                    </h1>
                  
-            </section>
+                 </section>
+                             <section class="card-inicio-container">
+                 
+                    <div class="card-inicio ">
+                        <h1>Crie um grupo</h1>
+                        <p>Junte seus amigos em um só lugar para organizar a próxima viagem de forma prática e divertida</p>
+                    </div>
+                    <div class="card-inicio card-destaque-3">
+                        <h1>Convide Amigos</h1>
+                        <p>Envie convites e traga quem você quiser para participar do planejamento junto com você</p>
+                    </div>
+                    <div class="card-inicio">
+                        <h1>Compartilhe planos</h1>
+                        <p>Defina destinos, hospedagens e passeios em grupo, deixando tudo transparente e colaborativo</p>
+                    </div>
+                     
+                             </section>
+             </div>
        </div>
     </div>
      <div class="main-container main-4">
          <img src="src\lencois_maranhenses.jpg" alt="">
-                <section class="main-conteinar-text-4">
-                    <h1>
-                        <strong>Gerencie seus gastos</strong>
-                    </h1>
-
-                </section>
-            <section class="card-inicio-container ">
-                <div class="card-inicio ">
-                    <h1>Planeje seus gastos</h1>
-                    <p>Organize os valores antes mesmo da viagem começar</p>
+                <div class="content-container">
+                    <section class="main-conteinar-text-4">
+                        <h1>
+                            <strong>Gerencie seus gastos</strong>
+                        </h1>
+                    </section>
+                                <section class="card-inicio-container ">
+                    <div class="card-inicio ">
+                        <h1>Planeje seus gastos</h1>
+                        <p>Organize os valores antes mesmo da viagem começar</p>
+                    </div>
+                    <div class="card-inicio card-destaque-4">
+                        <h1>Divida desespesas em grupo</h1>
+                        <p>Compartilhe custos de forma justa e transparente com todos os amigos</p>
+                    </div>
+                    <div class="card-inicio">
+                        <h1>Acompanhe tudo em tempo real</h1>
+                        <p>Veja o resumo dos gastos a qualquer momento e evite surpresas no fim da viagem</p>
+                    </div>
+                                </section>
                 </div>
-                <div class="card-inicio card-destaque-4">
-                    <h1>Divida desespesas em grupo</h1>
-                    <p>Compartilhe custos de forma justa e transparente com todos os amigos</p>
-                </div>
-                <div class="card-inicio">
-                    <h1>Acompanhe tudo em tempo real</h1>
-                    <p>Veja o resumo dos gastos a qualquer momento e evite surpresas no fim da viagem</p>
-                </div>
-            </section>
        </div>
     </div>
 

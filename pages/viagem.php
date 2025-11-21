@@ -1,9 +1,40 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location:  ../index.php");
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['token'])) {
+    header("Location: ../index.php");
     exit;
 }
+
+if (isset($_COOKIE['auth_token'])) {
+    $cookie_token = $_COOKIE['auth_token'];
+
+    // Verificar se o token da sessão está configurado
+    if (isset($_SESSION['token'])) {
+        $session_token = $_SESSION['token'];
+
+        // Validar se o token do cookie corresponde ao token da sessão
+        if ($cookie_token === $session_token) {
+            // O token é válido, o usuário está autenticado
+            $response = json_encode(['status' => 'success', 'message' => 'Autenticado com sucesso']);
+        } else {
+            // O token não corresponde
+            echo "Erro: Token inválido!";
+            header("Location: login.php");
+            exit;
+        }
+    } else {
+        // Nenhum token de sessão configurado
+        echo "Erro: Nenhum token de sessão encontrado!";
+        header("Location: login.php");
+        exit;
+    }
+} else {
+    // Nenhum cookie de autenticação encontrado
+    echo "Erro: Cookie de autenticação não encontrado!";
+    header("Location: login.php");
+    exit;
+}
+echo "<script>console.log('Resposta do servidor: ', $response);</script>";
 $usuario_nome = $_SESSION['usuario_nome'] ?? '';
 
 // Carregar o JSON com os destinos
@@ -34,40 +65,48 @@ if (!$destino_encontrado) {
 }
 
 // Funções auxiliares (as mesmas da página viagens.php)
-function getTipoViagem($nome, $principais_locais) {
+function getTipoViagem($nome, $principais_locais)
+{
     $nome_lower = strtolower($nome);
     $locais_str = strtolower(implode(' ', $principais_locais));
-    
-    if (strpos($nome_lower, 'praia') !== false || 
+
+    if (
+        strpos($nome_lower, 'praia') !== false ||
         strpos($locais_str, 'praia') !== false ||
         strpos($nome_lower, 'ilhabela') !== false ||
         strpos($nome_lower, 'noronha') !== false ||
         strpos($nome_lower, 'porto') !== false ||
         strpos($nome_lower, 'jericoacoara') !== false ||
         strpos($nome_lower, 'maragogi') !== false ||
-        strpos($nome_lower, 'tamandaré') !== false) {
+        strpos($nome_lower, 'tamandaré') !== false
+    ) {
         return 'praia';
-    } elseif (strpos($nome_lower, 'chapada') !== false || 
-               strpos($nome_lower, 'serra') !== false ||
-               strpos($nome_lower, 'cachoeira') !== false ||
-               strpos($nome_lower, 'jalapão') !== false ||
-               strpos($nome_lower, 'cataratas') !== false ||
-               strpos($nome_lower, 'bonito') !== false) {
+    } elseif (
+        strpos($nome_lower, 'chapada') !== false ||
+        strpos($nome_lower, 'serra') !== false ||
+        strpos($nome_lower, 'cachoeira') !== false ||
+        strpos($nome_lower, 'jalapão') !== false ||
+        strpos($nome_lower, 'cataratas') !== false ||
+        strpos($nome_lower, 'bonito') !== false
+    ) {
         return 'aventura';
-    } elseif (strpos($nome_lower, 'cristo') !== false || 
-               strpos($nome_lower, 'teatro') !== false ||
-               strpos($nome_lower, 'museu') !== false ||
-               strpos($nome_lower, 'mercado') !== false ||
-               strpos($nome_lower, 'manaus') !== false ||
-               strpos($nome_lower, 'curitiba') !== false ||
-               strpos($nome_lower, 'ouro preto') !== false) {
+    } elseif (
+        strpos($nome_lower, 'cristo') !== false ||
+        strpos($nome_lower, 'teatro') !== false ||
+        strpos($nome_lower, 'museu') !== false ||
+        strpos($nome_lower, 'mercado') !== false ||
+        strpos($nome_lower, 'manaus') !== false ||
+        strpos($nome_lower, 'curitiba') !== false ||
+        strpos($nome_lower, 'ouro preto') !== false
+    ) {
         return 'cidade';
     } else {
         return 'aventura';
     }
 }
 
-function getPrecoMedio($nome) {
+function getPrecoMedio($nome)
+{
     $precos = [
         'Fernando de Noronha' => 3500,
         'Jericoacoara' => 2800,
@@ -84,11 +123,12 @@ function getPrecoMedio($nome) {
         'Chapada Diamantina' => 900,
         'Jalapão' => 1100
     ];
-    
+
     return isset($precos[$nome]) ? $precos[$nome] : 1200;
 }
 
-function getDuracao($nome) {
+function getDuracao($nome)
+{
     $duracoes = [
         'Fernando de Noronha' => 7,
         'Jericoacoara' => 5,
@@ -104,11 +144,12 @@ function getDuracao($nome) {
         'Chapada Diamantina' => 5,
         'Jalapão' => 4
     ];
-    
+
     return isset($duracoes[$nome]) ? $duracoes[$nome] : 5;
 }
 
-function getImagemPadrao($tipo, $nome) {
+function getImagemPadrao($tipo, $nome)
+{
     $imagens = [
         'praia' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
         'aventura' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
@@ -116,7 +157,7 @@ function getImagemPadrao($tipo, $nome) {
         'montanha' => 'https://images.unsplash.com/photo-1464822759844-d2d137717a1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
         'romantico' => 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'
     ];
-    
+
     return $imagens[$tipo] ?? $imagens['aventura'];
 }
 
@@ -140,35 +181,37 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($destino_encontrado['nome']) ?> - Triply</title>
     <link rel="stylesheet" href="../styles/viagem.css" class="css">
 </head>
+
 <body>
     <nav class='navbar'>
-    <a href="home.php" class="logo">Triply</a>
-    
-    <!-- Menu Hamburger para Mobile -->
-    <div class="menu-toggle" id="menuToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    
-    <!-- Links de Navegação -->
-    <div class="nav-links" id="navLinks">
-        <span class="nav-main-links">
-            <a href="home.php">Inicio</a>
-            <a href="sobre.php">Sobre</a>
-            <a href="viagens.php">Viagens</a>
-            <a href="grupos.php">Grupos</a>
-        </span>
-        
-    </div>
-    <div class="nav-links" id="navLinks">
-        <span class="nav-user-section">
+        <a href="home.php" class="logo">Triply</a>
+
+        <!-- Menu Hamburger para Mobile -->
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Links de Navegação -->
+        <div class="nav-links" id="navLinks">
+            <span class="nav-main-links">
+                <a href="home.php">Inicio</a>
+                <a href="sobre.php">Sobre</a>
+                <a href="viagens.php">Viagens</a>
+                <a href="grupos.php">Grupos</a>
+            </span>
+
+        </div>
+        <div class="nav-links" id="navLinks">
+            <span class="nav-user-section">
                 <div class="user-dropdown">
                     <div class="user-info" onclick="toggleDropdown()">
                         <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
@@ -183,8 +226,8 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
                     </div>
                 </div>
             </span>
-    </div>
-</nav>
+        </div>
+    </nav>
 
     <section class="main">
         <div class="main-hero">
@@ -214,77 +257,77 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
                 </div>
             </div>
         </div>
-        
+
         <section class="content">
             <h1>Por que ir para <?= htmlspecialchars($destino_encontrado['nome']) ?>:</h1>
-            
+
             <div class="card-container">
                 <?php if ($num_atracoes > 0): ?>
-                <div class="information-card">
-                    <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="Atrações">
-                    <h2>Atrações turísticas</h2>
-                    <p>Descubra <?= $num_atracoes ?> locais incríveis para visitar, incluindo <?= implode(', ', array_slice($destino_encontrado['principais_locais'], 0, 3)) ?> e muito mais.</p>
-                </div>
+                    <div class="information-card">
+                        <img src="https://img.icons8.com/?size=100&id=E32iY1r0TxnO&format=png&color=000000" alt="Atrações">
+                        <h2>Atrações turísticas</h2>
+                        <p>Descubra <?= $num_atracoes ?> locais incríveis para visitar, incluindo <?= implode(', ', array_slice($destino_encontrado['principais_locais'], 0, 3)) ?> e muito mais.</p>
+                    </div>
                 <?php endif; ?>
-                
+
                 <?php if ($num_hospedagens > 0): ?>
-                <div class="information-card">
-                    <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="Hospedagens">
-                    <h2>Opções de hospedagem</h2>
-                    <p>Encontre <?= $num_hospedagens ?>+ opções de hospedagem para todos os gostos e orçamentos.</p>
-                </div>
+                    <div class="information-card">
+                        <img src="https://img.icons8.com/?size=100&id=WTANjzga8hWT&format=png&color=000000" alt="Hospedagens">
+                        <h2>Opções de hospedagem</h2>
+                        <p>Encontre <?= $num_hospedagens ?>+ opções de hospedagem para todos os gostos e orçamentos.</p>
+                    </div>
                 <?php endif; ?>
-                
+
                 <div class="information-card">
                     <img src="https://img.icons8.com/?size=100&id=7165&format=png&color=000000" alt="Duração">
                     <h2>Duração ideal</h2>
                     <p>Recomendamos <?= $duracao ?> dias para aproveitar tudo que <?= htmlspecialchars($destino_encontrado['nome']) ?> tem a oferecer.</p>
                 </div>
-                
+
                 <div class="information-card">
                     <img src="https://img.icons8.com/?size=100&id=11291&format=png&color=000000" alt="Preço">
                     <h2>Investimento</h2>
                     <p>Preço médio por pessoa: R$ <?= number_format($preco, 0, ',', '.') ?> para <?= $duracao ?> dias de viagem.</p>
                 </div>
             </div>
-            
-           <?php if (!empty($destino_encontrado['principais_locais'])): ?>
-            <div class="attractions-section">
-                <h2>Principais Atrações</h2>
-                <div class="attractions-list">
-                    <?php 
-                    $atracoes_limitadas = array_slice($destino_encontrado['principais_locais'], 0, 3);
-                    foreach ($atracoes_limitadas as $atracao): ?>
-                    <div class="attraction-item">
-                        <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" alt="Atração">
-                        <span><?= htmlspecialchars($atracao) ?></span>
+
+            <?php if (!empty($destino_encontrado['principais_locais'])): ?>
+                <div class="attractions-section">
+                    <h2>Principais Atrações</h2>
+                    <div class="attractions-list">
+                        <?php
+                        $atracoes_limitadas = array_slice($destino_encontrado['principais_locais'], 0, 3);
+                        foreach ($atracoes_limitadas as $atracao): ?>
+                            <div class="attraction-item">
+                                <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" alt="Atração">
+                                <span><?= htmlspecialchars($atracao) ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
+                    <?php if (count($destino_encontrado['principais_locais']) > 3): ?>
+                    <?php endif; ?>
                 </div>
-                <?php if (count($destino_encontrado['principais_locais']) > 3): ?>
-                <?php endif; ?>
-            </div>
             <?php endif; ?>
 
             <?php if (!empty($destino_encontrado['hospedagens'])): ?>
-            <div class="accommodation-section">
-                <h2>Opções de Hospedagem</h2>
-                <div class="accommodation-list">
-                    <?php 
-                    $hospedagens_limitadas = array_slice($destino_encontrado['hospedagens'], 0, 3);
-                    foreach ($hospedagens_limitadas as $hospedagem): ?>
-                    <div class="accommodation-item">
-                        <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" alt="Hospedagem">
-                        <span><?= htmlspecialchars($hospedagem) ?></span>
+                <div class="accommodation-section">
+                    <h2>Opções de Hospedagem</h2>
+                    <div class="accommodation-list">
+                        <?php
+                        $hospedagens_limitadas = array_slice($destino_encontrado['hospedagens'], 0, 3);
+                        foreach ($hospedagens_limitadas as $hospedagem): ?>
+                            <div class="accommodation-item">
+                                <img src="https://img.icons8.com/?size=100&id=59878&format=png&color=000000" alt="Hospedagem">
+                                <span><?= htmlspecialchars($hospedagem) ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
+                    <?php if (count($destino_encontrado['hospedagens']) > 3): ?>
+                    <?php endif; ?>
                 </div>
-                <?php if (count($destino_encontrado['hospedagens']) > 3): ?>
-                <?php endif; ?>
-            </div>
             <?php endif; ?>
-            </section>
-            </section>
+        </section>
+    </section>
 
     <footer>
         <div class="footer-container">
@@ -312,10 +355,10 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
 
             <div class="footer-social">
                 <h3>Siga nossas redes sociais</h3>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png"/></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png" /></a>
             </div>
         </div>
 
@@ -323,90 +366,91 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
             <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
         </div>
     </footer>
-    
+
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const navLinks = document.getElementById('navLinks');
         const mobileOverlay = document.createElement('div');
 
-        
+
         mobileOverlay.className = 'mobile-overlay';
         document.body.appendChild(mobileOverlay);
         menuToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        mobileOverlay.classList.toggle('active');
-        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
-    });
+            navLinks.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
 
-    mobileOverlay.addEventListener('click', function() {
-        navLinks.classList.remove('active');
-        mobileOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
+        mobileOverlay.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
 
-    // Fechar menu ao clicar em um link (mobile)
-    const navLinksItems = document.querySelectorAll('.nav-main-links a');
-    navLinksItems.forEach(link => {
-        link.addEventListener('click', function() {
+        // Fechar menu ao clicar em um link (mobile)
+        const navLinksItems = document.querySelectorAll('.nav-main-links a');
+        navLinksItems.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Dropdown functionality (atualizada)
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('active');
+
             if (window.innerWidth <= 768) {
+                // No mobile, o dropdown fica sempre visível quando ativo
+                return;
+            }
+
+            // Para desktop - comportamento original
+            if (dropdown.classList.contains('active')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'dropdown-overlay';
+                overlay.onclick = closeDropdown;
+                document.body.appendChild(overlay);
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function closeDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.remove('active');
+
+            const overlay = document.querySelector('.dropdown-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Fechar dropdown ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDropdown();
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Fechar menu ao redimensionar a janela para desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
                 navLinks.classList.remove('active');
                 mobileOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
-    });
 
-    // Dropdown functionality (atualizada)
-    function toggleDropdown() {
-        const dropdown = document.querySelector('.user-dropdown');
-        dropdown.classList.toggle('active');
-        
-        if (window.innerWidth <= 768) {
-            // No mobile, o dropdown fica sempre visível quando ativo
-            return;
-        }
-        
-        // Para desktop - comportamento original
-        if (dropdown.classList.contains('active')) {
-            const overlay = document.createElement('div');
-            overlay.className = 'dropdown-overlay';
-            overlay.onclick = closeDropdown;
-            document.body.appendChild(overlay);
-        } else {
-            closeDropdown();
-        }
-    }
-
-    function closeDropdown() {
-        const dropdown = document.querySelector('.user-dropdown');
-        dropdown.classList.remove('active');
-        
-        const overlay = document.querySelector('.dropdown-overlay');
-        if (overlay) {
-            overlay.remove();
-        }
-    }
-
-    // Fechar dropdown ao pressionar ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeDropdown();
-            if (window.innerWidth <= 768) {
-                navLinks.classList.remove('active');
-                mobileOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-    });
-
-    // Fechar menu ao redimensionar a janela para desktop
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            navLinks.classList.remove('active');
-            mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
         function createGroup(destinationName) {
             window.location.href = 'grupos.php';
         }
@@ -414,7 +458,7 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
         function toggleDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             dropdown.classList.toggle('active');
-            
+
             // Criar overlay para fechar ao clicar fora
             if (dropdown.classList.contains('active')) {
                 const overlay = document.createElement('div');
@@ -429,7 +473,7 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
         function closeDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             dropdown.classList.remove('active');
-            
+
             const overlay = document.querySelector('.dropdown-overlay');
             if (overlay) {
                 overlay.remove();
@@ -445,4 +489,5 @@ if ($num_atracoes > 0 && $num_hospedagens > 0) {
     </script>
     <script src="../scripts/script.js"></script>
 </body>
+
 </html>

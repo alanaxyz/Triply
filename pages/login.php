@@ -22,6 +22,13 @@ try {
         $_SESSION['usuario_nome'] = $usuario['nome'];
         $_SESSION['usuario_email'] = $usuario['email'];
 
+        // Gerar um token único para a sessão
+        $token = bin2hex(random_bytes(32)); // 64 caracteres
+        $_SESSION['token'] = $token; // Armazena o token na sessão
+
+        // Armazenar o token no cookie
+        setcookie('auth_token', $token, time() + 3600, '/', '', true, true); // Expira em 1 hora, seguro e HTTPOnly
+
         header("Location: home.php");
         exit;
     } else {
@@ -30,4 +37,3 @@ try {
 } catch (PDOException $e) {
     echo "Erro: " . $e->getMessage();
 }
-?>

@@ -1,43 +1,76 @@
 <?php
-    session_start();
-    if (!isset($_SESSION['usuario_id'])) {
-        header("Location: ../index.php");
+session_start();
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['token'])) {
+    header("Location: ../index.php");
+    exit;
+}
+
+if (isset($_COOKIE['auth_token'])) {
+    $cookie_token = $_COOKIE['auth_token'];
+
+    // Verificar se o token da sessão está configurado
+    if (isset($_SESSION['token'])) {
+        $session_token = $_SESSION['token'];
+
+        // Validar se o token do cookie corresponde ao token da sessão
+        if ($cookie_token === $session_token) {
+            // O token é válido, o usuário está autenticado
+            $response = json_encode(['status' => 'success', 'message' => 'Autenticado com sucesso']);
+        } else {
+            // O token não corresponde
+            echo "Erro: Token inválido!";
+            header("Location: login.php");
+            exit;
+        }
+    } else {
+        // Nenhum token de sessão configurado
+        echo "Erro: Nenhum token de sessão encontrado!";
+        header("Location: login.php");
         exit;
     }
-    $usuario_nome = $_SESSION['usuario_nome'] ?? '';
+} else {
+    // Nenhum cookie de autenticação encontrado
+    echo "Erro: Cookie de autenticação não encontrado!";
+    header("Location: login.php");
+    exit;
+}
+echo "<script>console.log('Resposta do servidor: ', $response);</script>";
+$usuario_nome = $_SESSION['usuario_nome'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/sobre.css">
     <title>Sobre - Triply</title>
-    
+
 </head>
+
 <body>
     <nav class='navbar'>
-    <a href="home.php" class="logo">Triply</a>
-    
-    <!-- Menu Hamburger para Mobile -->
-    <div class="menu-toggle" id="menuToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    
-    <!-- Links de Navegação -->
-    <div class="nav-links" id="navLinks">
-        <span class="nav-main-links">
-            <a href="home.php">Inicio</a>
-            <a href="sobre.php">Sobre</a>
-            <a href="viagens.php">Viagens</a>
-            <a href="grupos.php">Grupos</a>
-        </span>
-        
-    </div>
-    <div class="nav-links" id="navLinks">
-        <span class="nav-user-section">
+        <a href="home.php" class="logo">Triply</a>
+
+        <!-- Menu Hamburger para Mobile -->
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Links de Navegação -->
+        <div class="nav-links" id="navLinks">
+            <span class="nav-main-links">
+                <a href="home.php">Inicio</a>
+                <a href="sobre.php">Sobre</a>
+                <a href="viagens.php">Viagens</a>
+                <a href="grupos.php">Grupos</a>
+            </span>
+
+        </div>
+        <div class="nav-links" id="navLinks">
+            <span class="nav-user-section">
                 <div class="user-dropdown">
                     <div class="user-info" onclick="toggleDropdown()">
                         <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
@@ -52,8 +85,8 @@
                     </div>
                 </div>
             </span>
-    </div>
-</nav>
+        </div>
+    </nav>
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -65,7 +98,7 @@
     <!-- Conteúdo Principal -->
     <main class="main-content">
         <div class="container">
-           
+
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Nossa História</h2>
@@ -90,7 +123,7 @@
                 </div>
             </section>
 
-          
+
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Missão e Visão</h2>
@@ -108,7 +141,7 @@
                 </div>
             </section>
 
-           
+
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">O Que Oferecemos</h2>
@@ -133,29 +166,29 @@
                 </div>
             </section
 
-           
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Fale Conosco</h2>
-                    <p class="section-subtitle">Estamos aqui para ajudar a tornar suas viagens inesquecíveis</p>
+
+                <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Fale Conosco</h2>
+                <p class="section-subtitle">Estamos aqui para ajudar a tornar suas viagens inesquecíveis</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email</h3>
+                    <p>contato@triply.com</p>
                 </div>
-                <div class="contact-grid">
-                    <div class="contact-item">
-                        <div class="contact-icon">📧</div>
-                        <h3>Email</h3>
-                        <p>contato@triply.com</p>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">📞</div>
-                        <h3>Telefone</h3>
-                        <p>(61) 99999-9999</p>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">📍</div>
-                        <h3>Endereço</h3>
-                        <p>Brasília - DF, Brasil</p>
-                    </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <h3>Telefone</h3>
+                    <p>(61) 99999-9999</p>
                 </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <h3>Endereço</h3>
+                    <p>Brasília - DF, Brasil</p>
+                </div>
+            </div>
             </section>
         </div>
     </main>
@@ -197,94 +230,94 @@
             <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
         </div>
     </footer>
-<script>
-    const menuToggle = document.getElementById('menuToggle');
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
         const navLinks = document.getElementById('navLinks');
         const mobileOverlay = document.createElement('div');
 
-        
+
         mobileOverlay.className = 'mobile-overlay';
         document.body.appendChild(mobileOverlay);
         menuToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        mobileOverlay.classList.toggle('active');
-        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
-    });
+            navLinks.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
 
-    mobileOverlay.addEventListener('click', function() {
-        navLinks.classList.remove('active');
-        mobileOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
+        mobileOverlay.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
 
-    // Fechar menu ao clicar em um link (mobile)
-    const navLinksItems = document.querySelectorAll('.nav-main-links a');
-    navLinksItems.forEach(link => {
-        link.addEventListener('click', function() {
+        // Fechar menu ao clicar em um link (mobile)
+        const navLinksItems = document.querySelectorAll('.nav-main-links a');
+        navLinksItems.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Dropdown functionality (atualizada)
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('active');
+
             if (window.innerWidth <= 768) {
+                // No mobile, o dropdown fica sempre visível quando ativo
+                return;
+            }
+
+            // Para desktop - comportamento original
+            if (dropdown.classList.contains('active')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'dropdown-overlay';
+                overlay.onclick = closeDropdown;
+                document.body.appendChild(overlay);
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function closeDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.remove('active');
+
+            const overlay = document.querySelector('.dropdown-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Fechar dropdown ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDropdown();
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // Fechar menu ao redimensionar a janela para desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
                 navLinks.classList.remove('active');
                 mobileOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
-    });
-
-    // Dropdown functionality (atualizada)
-    function toggleDropdown() {
-        const dropdown = document.querySelector('.user-dropdown');
-        dropdown.classList.toggle('active');
-        
-        if (window.innerWidth <= 768) {
-            // No mobile, o dropdown fica sempre visível quando ativo
-            return;
-        }
-        
-        // Para desktop - comportamento original
-        if (dropdown.classList.contains('active')) {
-            const overlay = document.createElement('div');
-            overlay.className = 'dropdown-overlay';
-            overlay.onclick = closeDropdown;
-            document.body.appendChild(overlay);
-        } else {
-            closeDropdown();
-        }
-    }
-
-    function closeDropdown() {
-        const dropdown = document.querySelector('.user-dropdown');
-        dropdown.classList.remove('active');
-        
-        const overlay = document.querySelector('.dropdown-overlay');
-        if (overlay) {
-            overlay.remove();
-        }
-    }
-
-    // Fechar dropdown ao pressionar ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeDropdown();
-            if (window.innerWidth <= 768) {
-                navLinks.classList.remove('active');
-                mobileOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-    });
-
-    // Fechar menu ao redimensionar a janela para desktop
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            navLinks.classList.remove('active');
-            mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-    // Dropdown functionality
+        // Dropdown functionality
         function toggleDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             dropdown.classList.toggle('active');
-            
+
             // Criar overlay para fechar ao clicar fora
             if (dropdown.classList.contains('active')) {
                 const overlay = document.createElement('div');
@@ -299,7 +332,7 @@
         function closeDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             dropdown.classList.remove('active');
-            
+
             const overlay = document.querySelector('.dropdown-overlay');
             if (overlay) {
                 overlay.remove();
@@ -312,6 +345,7 @@
                 closeDropdown();
             }
         });
-</script>
+    </script>
 </body>
+
 </html>

@@ -1,9 +1,40 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location:  ../index.php");
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['token'])) {
+    header("Location: ../index.php");
     exit;
 }
+
+if (isset($_COOKIE['auth_token'])) {
+    $cookie_token = $_COOKIE['auth_token'];
+
+    // Verificar se o token da sessão está configurado
+    if (isset($_SESSION['token'])) {
+        $session_token = $_SESSION['token'];
+
+        // Validar se o token do cookie corresponde ao token da sessão
+        if ($cookie_token === $session_token) {
+            // O token é válido, o usuário está autenticado
+            $response = json_encode(['status' => 'success', 'message' => 'Autenticado com sucesso']);
+        } else {
+            // O token não corresponde
+            echo "Erro: Token inválido!";
+            header("Location: login.php");
+            exit;
+        }
+    } else {
+        // Nenhum token de sessão configurado
+        echo "Erro: Nenhum token de sessão encontrado!";
+        header("Location: login.php");
+        exit;
+    }
+} else {
+    // Nenhum cookie de autenticação encontrado
+    echo "Erro: Cookie de autenticação não encontrado!";
+    header("Location: login.php");
+    exit;
+}
+echo "<script>console.log('Resposta do servidor: ', $response);</script>";
 $usuario_nome = $_SESSION['usuario_nome'] ?? '';
 
 // Carregar o JSON com os destinos
@@ -11,33 +42,40 @@ $json_data = file_get_contents('../scripts/destinos.json');
 $destinos = json_decode($json_data, true);
 
 // Função para determinar o tipo de viagem baseado no nome/local
-function getTipoViagem($nome, $principais_locais) {
+function getTipoViagem($nome, $principais_locais)
+{
     $nome_lower = strtolower($nome);
     $locais_str = strtolower(implode(' ', $principais_locais));
-    
-    if (strpos($nome_lower, 'praia') !== false || 
+
+    if (
+        strpos($nome_lower, 'praia') !== false ||
         strpos($locais_str, 'praia') !== false ||
         strpos($nome_lower, 'ilhabela') !== false ||
         strpos($nome_lower, 'noronha') !== false ||
         strpos($nome_lower, 'porto') !== false ||
         strpos($nome_lower, 'jericoacoara') !== false ||
         strpos($nome_lower, 'maragogi') !== false ||
-        strpos($nome_lower, 'tamandaré') !== false) {
+        strpos($nome_lower, 'tamandaré') !== false
+    ) {
         return 'praia';
-    } elseif (strpos($nome_lower, 'chapada') !== false || 
-               strpos($nome_lower, 'serra') !== false ||
-               strpos($nome_lower, 'cachoeira') !== false ||
-               strpos($nome_lower, 'jalapão') !== false ||
-               strpos($nome_lower, 'cataratas') !== false ||
-               strpos($nome_lower, 'bonito') !== false) {
+    } elseif (
+        strpos($nome_lower, 'chapada') !== false ||
+        strpos($nome_lower, 'serra') !== false ||
+        strpos($nome_lower, 'cachoeira') !== false ||
+        strpos($nome_lower, 'jalapão') !== false ||
+        strpos($nome_lower, 'cataratas') !== false ||
+        strpos($nome_lower, 'bonito') !== false
+    ) {
         return 'aventura';
-    } elseif (strpos($nome_lower, 'cristo') !== false || 
-               strpos($nome_lower, 'teatro') !== false ||
-               strpos($nome_lower, 'museu') !== false ||
-               strpos($nome_lower, 'mercado') !== false ||
-               strpos($nome_lower, 'manaus') !== false ||
-               strpos($nome_lower, 'curitiba') !== false ||
-               strpos($nome_lower, 'ouro preto') !== false) {
+    } elseif (
+        strpos($nome_lower, 'cristo') !== false ||
+        strpos($nome_lower, 'teatro') !== false ||
+        strpos($nome_lower, 'museu') !== false ||
+        strpos($nome_lower, 'mercado') !== false ||
+        strpos($nome_lower, 'manaus') !== false ||
+        strpos($nome_lower, 'curitiba') !== false ||
+        strpos($nome_lower, 'ouro preto') !== false
+    ) {
         return 'cidade';
     } else {
         return 'aventura';
@@ -45,7 +83,8 @@ function getTipoViagem($nome, $principais_locais) {
 }
 
 // Função para obter imagem padrão baseada no tipo
-function getImagemPadrao($tipo, $nome) {
+function getImagemPadrao($tipo, $nome)
+{
     $imagens = [
         'praia' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
         'aventura' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
@@ -53,7 +92,7 @@ function getImagemPadrao($tipo, $nome) {
         'montanha' => 'https://images.unsplash.com/photo-1464822759844-d2d137717a1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
         'romantico' => 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'
     ];
-    
+
     return $imagens[$tipo] ?? $imagens['aventura'];
 }
 
@@ -71,11 +110,12 @@ foreach ($indices_aleatorios as $indice) {
 }
 
 // Gerar descrições curtas baseadas no tipo e características
-function gerarDescricaoCurta($destino) {
+function gerarDescricaoCurta($destino)
+{
     $tipo = getTipoViagem($destino['nome'], $destino['principais_locais'] ?? []);
     $cidade = $destino['cidade'];
     $estado = $destino['estado'];
-    
+
     $descricoes = [
         'praia' => [
             "Praias paradisíacas e águas cristalinas em $cidade.",
@@ -93,46 +133,48 @@ function gerarDescricaoCurta($destino) {
             "Experiência urbana única em $cidade."
         ]
     ];
-    
+
     $tipo_desc = $tipo;
     if (!isset($descricoes[$tipo])) {
         $tipo_desc = 'aventura';
     }
-    
+
     $opcoes = $descricoes[$tipo_desc];
     return $opcoes[array_rand($opcoes)];
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site de Viagens</title>
     <link rel="stylesheet" href="../styles/home.css" class="css">
 </head>
+
 <body>
     <nav class='navbar'>
-    <a href="home.php" class="logo">Triply</a>
-    
-    <!-- Menu Hamburger para Mobile -->
-    <div class="menu-toggle" id="menuToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    
-    <!-- Links de Navegação -->
-    <div class="nav-links" id="navLinks">
-        <span class="nav-main-links">
-            <a href="home.php">Inicio</a>
-            <a href="sobre.php">Sobre</a>
-            <a href="viagens.php">Viagens</a>
-            <a href="grupos.php">Grupos</a>
-        </span>
-    </div>
-    <div class="nav-links" id="navLinks">
-        <span class="nav-user-section">
+        <a href="home.php" class="logo">Triply</a>
+
+        <!-- Menu Hamburger para Mobile -->
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Links de Navegação -->
+        <div class="nav-links" id="navLinks">
+            <span class="nav-main-links">
+                <a href="home.php">Inicio</a>
+                <a href="sobre.php">Sobre</a>
+                <a href="viagens.php">Viagens</a>
+                <a href="grupos.php">Grupos</a>
+            </span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <span class="nav-user-section">
                 <div class="user-dropdown">
                     <div class="user-info" onclick="toggleDropdown()">
                         <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=000000" alt="">
@@ -147,8 +189,8 @@ function gerarDescricaoCurta($destino) {
                     </div>
                 </div>
             </span>
-    </div>
-</nav>
+        </div>
+    </nav>
     <div class='main'>
         <div class="carousel-container">
             <div class="carousel">
@@ -173,27 +215,27 @@ function gerarDescricaoCurta($destino) {
                 <small><em>Destaques atualizados a cada visita</em></small>
             </div>
             <div class="sugestoes-cards">
-                <?php foreach ($destinos_aleatorios as $destino): 
+                <?php foreach ($destinos_aleatorios as $destino):
                     if (empty($destino['nome'])) continue;
-                    
+
                     $tipo = getTipoViagem($destino['nome'], $destino['principais_locais'] ?? []);
                     $imagem = !empty($destino['imagem']) ? $destino['imagem'] : getImagemPadrao($tipo, $destino['nome']);
                     $descricao = gerarDescricaoCurta($destino);
                 ?>
-                <div class="card">
-                    <div class="card-img" style="background-image: url('<?= $imagem ?>')"></div>
-                    <div class="card-info">
-                        <h2><?= htmlspecialchars($destino['nome']) ?></h2>
-                        <p><?= $descricao ?></p>
-                        <a href="viagem.php?destino=<?= urlencode($destino['nome']) ?>">Saiba mais</a>
+                    <div class="card">
+                        <div class="card-img" style="background-image: url('<?= $imagem ?>')"></div>
+                        <div class="card-info">
+                            <h2><?= htmlspecialchars($destino['nome']) ?></h2>
+                            <p><?= $descricao ?></p>
+                            <a href="viagem.php?destino=<?= urlencode($destino['nome']) ?>">Saiba mais</a>
+                        </div>
                     </div>
-                </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
 
-   <footer>
+    <footer>
         <div class="footer-container">
             <div class="footer-logo">
                 <h2>Triply</h2>
@@ -219,10 +261,10 @@ function gerarDescricaoCurta($destino) {
 
             <div class="footer-social">
                 <h3>Siga nossas redes sociais</h3>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png"/></a>
-                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png"/></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png" /></a>
+                <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png" /></a>
             </div>
         </div>
 
@@ -233,109 +275,110 @@ function gerarDescricaoCurta($destino) {
 
     <script>
         // Menu Mobile
-const menuToggle = document.getElementById('menuToggle');
-const navLinks = document.getElementById('navLinks');
-const mobileOverlay = document.createElement('div');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const mobileOverlay = document.createElement('div');
 
-mobileOverlay.className = 'mobile-overlay';
-document.body.appendChild(mobileOverlay);
+        mobileOverlay.className = 'mobile-overlay';
+        document.body.appendChild(mobileOverlay);
 
-menuToggle.addEventListener('click', function() {
-    navLinks.classList.toggle('active');
-    mobileOverlay.classList.toggle('active');
-    document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
-});
+        menuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
 
-mobileOverlay.addEventListener('click', function() {
-    navLinks.classList.remove('active');
-    mobileOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-});
-
-// Carrossel automático
-let currentIndex = 0;
-const images = document.querySelectorAll('.carousel-images img');
-const totalImages = images.length;
-
-function showNextImage() {
-    currentIndex = (currentIndex + 1) % totalImages;
-    updateCarousel();
-}
-
-function updateCarousel() {
-    const carousel = document.getElementById('carousel');
-    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
-}
-
-// Mudar imagem a cada 5 segundos
-setInterval(showNextImage, 5000);
-
-// Função de busca
-function searchDestination() {
-    const searchTerm = document.getElementById('searchInput').value.trim();
-    if (searchTerm) {
-        window.location.href = 'viagens.php?search=' + encodeURIComponent(searchTerm);
-    } else {
-        window.location.href = 'viagens.php';
-    }
-}
-
-// Permitir busca com Enter
-document.getElementById('searchInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        searchDestination();
-    }
-});
-
-// Dropdown functionality
-function toggleDropdown() {
-    const dropdown = document.querySelector('.user-dropdown');
-    dropdown.classList.toggle('active');
-    
-    if (window.innerWidth <= 768) {
-        return;
-    }
-    
-    if (dropdown.classList.contains('active')) {
-        const overlay = document.createElement('div');
-        overlay.className = 'dropdown-overlay';
-        overlay.onclick = closeDropdown;
-        document.body.appendChild(overlay);
-    } else {
-        closeDropdown();
-    }
-}
-
-function closeDropdown() {
-    const dropdown = document.querySelector('.user-dropdown');
-    dropdown.classList.remove('active');
-    
-    const overlay = document.querySelector('.dropdown-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
-}
-
-// Fechar menu ao redimensionar para desktop
-window.addEventListener('resize', function() {
-    if (window.innerWidth > 768) {
-        navLinks.classList.remove('active');
-        mobileOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-});
-
-// Fechar dropdown ao pressionar ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeDropdown();
-        if (window.innerWidth <= 768) {
+        mobileOverlay.addEventListener('click', function() {
             navLinks.classList.remove('active');
             mobileOverlay.classList.remove('active');
             document.body.style.overflow = '';
+        });
+
+        // Carrossel automático
+        let currentIndex = 0;
+        const images = document.querySelectorAll('.carousel-images img');
+        const totalImages = images.length;
+
+        function showNextImage() {
+            currentIndex = (currentIndex + 1) % totalImages;
+            updateCarousel();
         }
-    }
-});
+
+        function updateCarousel() {
+            const carousel = document.getElementById('carousel');
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+        // Mudar imagem a cada 5 segundos
+        setInterval(showNextImage, 5000);
+
+        // Função de busca
+        function searchDestination() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                window.location.href = 'viagens.php?search=' + encodeURIComponent(searchTerm);
+            } else {
+                window.location.href = 'viagens.php';
+            }
+        }
+
+        // Permitir busca com Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchDestination();
+            }
+        });
+
+        // Dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('active');
+
+            if (window.innerWidth <= 768) {
+                return;
+            }
+
+            if (dropdown.classList.contains('active')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'dropdown-overlay';
+                overlay.onclick = closeDropdown;
+                document.body.appendChild(overlay);
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function closeDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.remove('active');
+
+            const overlay = document.querySelector('.dropdown-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Fechar menu ao redimensionar para desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Fechar dropdown ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDropdown();
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
     </script>
 </body>
+
 </html>

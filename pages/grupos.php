@@ -79,7 +79,7 @@ function gerarCodigoGrupo($db)
 $grupos_usuario = [];
 try {
     $stmt = $db->prepare("
-        SELECT g.*, ug.data_entrada 
+        SELECT g.*, ug.data_entrada, ug.funcao
         FROM grupos g
         INNER JOIN usuario_grupo ug ON g.id = ug.grupo_id
         WHERE ug.usuario_id = ?
@@ -146,12 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $grupo_id = $db->lastInsertId();
 
-                // 2. Inserir na tabela usuario_grupo (o criador automaticamente entra no grupo)
-                $sql_usuario_grupo = "INSERT INTO usuario_grupo (usuario_id, grupo_id) VALUES (?, ?)";
+                $sql_usuario_grupo = "INSERT INTO usuario_grupo (usuario_id, grupo_id, funcao) VALUES (?, ?, 'admin')";
                 $stmt_usuario_grupo = $db->prepare($sql_usuario_grupo);
                 $stmt_usuario_grupo->execute([$usuario_id, $grupo_id]);
 
-                // Commit da transação
                 $db->commit();
 
                 // Resposta de sucesso com o código gerado
@@ -204,8 +202,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt_check->fetch()) {
                     echo json_encode(['success' => false, 'message' => 'Você já está neste grupo']);
                 } else {
-                    // Adicionar usuário ao grupo
-                    $stmt_join = $db->prepare("INSERT INTO usuario_grupo (usuario_id, grupo_id) VALUES (?, ?)");
+                    // Adicionar usuário ao grupo como 'usuario'
+                    $stmt_join = $db->prepare("INSERT INTO usuario_grupo (usuario_id, grupo_id, funcao) VALUES (?, ?, 'usuario')");
                     $stmt_join->execute([$usuario_id, $grupo['id']]);
 
                     echo json_encode(['success' => true, 'message' => 'Entrou no grupo com sucesso!']);
@@ -349,6 +347,9 @@ $tem_grupos = !empty($grupos_usuario);
                                             <p class="group-destination"><?= htmlspecialchars($grupo['destino']) ?></p>
                                             <div class="group-members">
                                                 <span><?= $total_membros ?>/<?= $grupo['numero_maximo_membros'] ?> membros</span>
+                                                <?php if ($grupo['funcao'] === 'admin'): ?>
+                                                    <span class="admin-badge">Administrador</span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -366,7 +367,6 @@ $tem_grupos = !empty($grupos_usuario);
                                         <div class="progress-percentage"><?= $porcentagem ?>% concluído</div>
                                     </div>
                                     <div class="group-actions">
-                                        <button class="btn-outline" onclick="viewGroupDetails(<?= $grupo['id'] ?>)">Detalhes</button>
                                         <button class="btn-primary" onclick="window.location.href='grupo.php?id=<?= $grupo['id'] ?>'">Entrar</button>
                                     </div>
                                 </div>
@@ -456,6 +456,48 @@ $tem_grupos = !empty($grupos_usuario);
             </div>
         </div>
     </div>
+    <footer>
+                <div class="footer-container">
+                    <!-- Logo / Nome -->
+                    <div class="footer-logo">
+                        <h2>Triply</h2>
+                        <p>Veja, planeje e viaje.</p>
+                    </div>
+
+                    <!-- Links rápidos -->
+                    <div class="footer-links">
+                        <h3>Links rápidos</h3>
+                        <ul>
+                            <li><a href="home.php">Início</a></li>
+                            <li><a href="sobre.php">Sobre</a></li>
+                            <li><a href="viagens.php">Viagens</a></li>
+                            <li><a href="grupos.php">Grupos</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contato -->
+                    <div class="footer-contact">
+                        <h3>Contato</h3>
+                        <p>Email: contato@triply.com</p>
+                        <p>Telefone: (61) 99999-9999</p>
+                        <p>Endereço: Brasília - DF</p>
+                    </div>
+
+                    <!-- Redes sociais -->
+                    <div class="footer-social">
+                        <h3>Siga nossas redes sociais</h3>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png" /></a>
+                    </div>
+                </div>
+
+                <!-- Direitos autorais -->
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
+                </div>
+            </footer>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');

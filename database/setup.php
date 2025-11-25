@@ -38,6 +38,7 @@ try {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario_id INTEGER NOT NULL,
         grupo_id INTEGER NOT NULL,
+        funcao TEXT,
         data_entrada TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (usuario_id) REFERENCES users(id),
         FOREIGN KEY (grupo_id) REFERENCES grupos(id),

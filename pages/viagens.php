@@ -248,16 +248,6 @@ function getImagemPadrao($tipo, $nome)
                             <option value="premium">Premium (acima de R$ 3.000)</option>
                         </select>
                     </div>
-
-                    <div class="filter-group">
-                        <label for="duration">Duração</label>
-                        <select id="duration">
-                            <option value="">Qualquer duração</option>
-                            <option value="curta">Curta (2-4 dias)</option>
-                            <option value="media">Média (5-7 dias)</option>
-                            <option value="longa">Longa (8+ dias)</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="filter-actions">
                     <button class="btn-filter btn-apply" onclick="applyFilters()">Aplicar Filtros</button>
@@ -376,16 +366,52 @@ function getImagemPadrao($tipo, $nome)
 
     <!-- Footer -->
     <footer>
-        <div class="footer-container">
-            <!-- Conteúdo do footer mantido igual -->
-        </div>
-    </footer>
+                <div class="footer-container">
+                    <!-- Logo / Nome -->
+                    <div class="footer-logo">
+                        <h2>Triply</h2>
+                        <p>Veja, planeje e viaje.</p>
+                    </div>
+
+                    <!-- Links rápidos -->
+                    <div class="footer-links">
+                        <h3>Links rápidos</h3>
+                        <ul>
+                            <li><a href="home.php">Início</a></li>
+                            <li><a href="sobre.php">Sobre</a></li>
+                            <li><a href="viagens.php">Viagens</a></li>
+                            <li><a href="grupos.php">Grupos</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contato -->
+                    <div class="footer-contact">
+                        <h3>Contato</h3>
+                        <p>Email: contato@triply.com</p>
+                        <p>Telefone: (61) 99999-9999</p>
+                        <p>Endereço: Brasília - DF</p>
+                    </div>
+
+                    <!-- Redes sociais -->
+                    <div class="footer-social">
+                        <h3>Siga nossas redes sociais</h3>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/instagram-new.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/twitter.png" /></a>
+                        <a href="#"><img src="https://img.icons8.com/ios-filled/24/ffffff/youtube-play.png" /></a>
+                    </div>
+                </div>
+
+                <!-- Direitos autorais -->
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Triply. Todos os direitos reservados.</p>
+                </div>
+            </footer>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const navLinks = document.getElementById('navLinks');
         const mobileOverlay = document.createElement('div');
-
 
         mobileOverlay.className = 'mobile-overlay';
         document.body.appendChild(mobileOverlay);
@@ -469,7 +495,6 @@ function getImagemPadrao($tipo, $nome)
             const destinationFilter = document.getElementById('destination').value.toLowerCase();
             const typeFilter = document.getElementById('type').value;
             const priceFilter = document.getElementById('price-range').value;
-            const durationFilter = document.getElementById('duration').value;
 
             const cards = document.querySelectorAll('.destination-card');
 
@@ -494,11 +519,6 @@ function getImagemPadrao($tipo, $nome)
                     show = false;
                 }
 
-                // Filtro por duração
-                if (durationFilter && card.dataset.duration !== durationFilter) {
-                    show = false;
-                }
-
                 card.style.display = show ? 'block' : 'none';
             });
         }
@@ -518,7 +538,6 @@ function getImagemPadrao($tipo, $nome)
             document.getElementById('destination').value = '';
             document.getElementById('type').value = '';
             document.getElementById('price-range').value = '';
-            document.getElementById('duration').value = '';
 
             const cards = document.querySelectorAll('.destination-card');
             cards.forEach(card => {
@@ -536,11 +555,8 @@ function getImagemPadrao($tipo, $nome)
             window.location.href = 'grupos.php';
         }
 
-        // Aplicar filtros em tempo real
-        document.getElementById('destination').addEventListener('input', applyFilters);
-        document.getElementById('type').addEventListener('change', applyFilters);
-        document.getElementById('price-range').addEventListener('change', applyFilters);
-        document.getElementById('duration').addEventListener('change', applyFilters);
+
+
         // Dropdown functionality
         function toggleDropdown() {
             const dropdown = document.querySelector('.user-dropdown');

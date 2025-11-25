@@ -110,13 +110,190 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     }
 }
 
+// Processar configurações do grupo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
+    if ($_POST['acao'] === 'atualizar_configuracoes' && $_POST['grupo_id'] == $grupo_id) {
+        try {
+            // Verificar se o usuário é admin
+            $stmt_check_admin = $db->prepare("
+                SELECT funcao FROM usuario_grupo 
+                WHERE grupo_id = ? AND usuario_id = ?
+            ");
+            $stmt_check_admin->execute([$grupo_id, $usuario_id]);
+            $user_funcao = $stmt_check_admin->fetchColumn();
+
+            if ($user_funcao !== 'admin') {
+                throw new Exception('Apenas administradores podem editar as configurações do grupo.');
+            }
+
+            // Validar número de membros
+            $novo_numero_membros = intval($_POST['numero_maximo_membros']);
+            $stmt_count_membros = $db->prepare("SELECT COUNT(*) FROM usuario_grupo WHERE grupo_id = ?");
+            $stmt_count_membros->execute([$grupo_id]);
+            $membros_atuais = $stmt_count_membros->fetchColumn();
+
+            if ($novo_numero_membros < $membros_atuais) {
+                throw new Exception("Não é possível reduzir o número máximo de membros para menos do que os atuais ($membros_atuais membros).");
+            }
+
+            // Atualizar configurações
+            $stmt_update = $db->prepare("
+                UPDATE grupos 
+                SET nome_grupo = ?, destino = ?, descricao = ?, data_inicio = ?, data_fim = ?, 
+                    orcamento_total = ?, numero_maximo_membros = ?
+                WHERE id = ?
+            ");
+
+            $stmt_update->execute([
+                $_POST['nome_grupo'],
+                $_POST['destino'],
+                $_POST['descricao'] ?? null,
+                $_POST['data_inicio'],
+                $_POST['data_fim'],
+                $_POST['orcamento_total'],
+                $novo_numero_membros,
+                $grupo_id
+            ]);
+
+            // Registrar atividade
+            $stmt_atividade = $db->prepare("
+                INSERT INTO atividades (grupo_id, usuario_id, tipo, descricao, data_atividade)
+                VALUES (?, ?, 'alteracao', ?, CURRENT_TIMESTAMP)
+            ");
+            $stmt_atividade->execute([
+                $grupo_id,
+                $usuario_id,
+                "atualizou as configurações do grupo"
+            ]);
+
+            $_SESSION['config_sucesso'] = 'Configurações atualizadas com sucesso!';
+            header("Location: grupo.php?id=" . $grupo_id . "&success=1");
+            exit;
+        } catch (Exception $e) {
+            $_SESSION['erro_config'] = $e->getMessage();
+            header("Location: grupo.php?id=" . $grupo_id);
+            exit;
+        }
+    }
+
+    // Processar sugestão de atividade
+    if ($_POST['acao'] === 'sugerir_atividade' && $_POST['grupo_id'] == $grupo_id) {
+        try {
+            $descricao_atividade = trim($_POST['descricao_atividade'] ?? '');
+
+            if (empty($descricao_atividade)) {
+                throw new Exception('A descrição da atividade é obrigatória.');
+            }
+
+            // Verificar se o usuário é membro do grupo
+            $stmt_membro = $db->prepare("
+                SELECT 1 FROM usuario_grupo 
+                WHERE usuario_id = ? AND grupo_id = ?
+            ");
+            $stmt_membro->execute([$usuario_id, $grupo_id]);
+
+            if (!$stmt_membro->fetch()) {
+                throw new Exception("Você não é membro deste grupo");
+            }
+
+            // Inserir atividade como sugestão
+            $stmt_atividade = $db->prepare("
+                INSERT INTO atividades (grupo_id, usuario_id, tipo, descricao, data_atividade)
+                VALUES (?, ?, 'sugestao', ?, CURRENT_TIMESTAMP)
+            ");
+
+            $stmt_atividade->execute([
+                $grupo_id,
+                $usuario_id,
+                $descricao_atividade
+            ]);
+
+            $_SESSION['atividade_sucesso'] = 'Sugestão de atividade enviada com sucesso!';
+            header("Location: grupo.php?id=" . $grupo_id);
+            exit;
+
+        } catch (Exception $e) {
+            $_SESSION['erro_atividade'] = $e->getMessage();
+            header("Location: grupo.php?id=" . $grupo_id);
+            exit;
+        }
+    }
+
+    // Processar exclusão do grupo
+    if ($_POST['acao'] === 'excluir_grupo' && $_POST['grupo_id'] == $grupo_id) {
+        try {
+            // Verificar se o usuário é admin
+            $stmt_check_admin = $db->prepare("
+                SELECT funcao FROM usuario_grupo 
+                WHERE grupo_id = ? AND usuario_id = ?
+            ");
+            $stmt_check_admin->execute([$grupo_id, $usuario_id]);
+            $user_funcao = $stmt_check_admin->fetchColumn();
+
+            if ($user_funcao !== 'admin') {
+                throw new Exception('Apenas administradores podem excluir o grupo.');
+            }
+
+            // Verificar confirmação
+            if ($_POST['confirmacao'] !== 'EXCLUIR') {
+                throw new Exception('Confirmação incorreta. Digite EXCLUIR para confirmar.');
+            }
+
+            // Iniciar transação
+            $db->beginTransaction();
+
+            try {
+                // Excluir contribuições
+                $stmt_del_contrib = $db->prepare("DELETE FROM contribuicoes WHERE grupo_id = ?");
+                $stmt_del_contrib->execute([$grupo_id]);
+
+                // Excluir atividades
+                $stmt_del_ativ = $db->prepare("DELETE FROM atividades WHERE grupo_id = ?");
+                $stmt_del_ativ->execute([$grupo_id]);
+
+                // Excluir membros do grupo
+                $stmt_del_membros = $db->prepare("DELETE FROM usuario_grupo WHERE grupo_id = ?");
+                $stmt_del_membros->execute([$grupo_id]);
+
+                // Excluir o grupo
+                $stmt_del_grupo = $db->prepare("DELETE FROM grupos WHERE id = ?");
+                $stmt_del_grupo->execute([$grupo_id]);
+
+                // Confirmar transação
+                $db->commit();
+
+                $_SESSION['mensagem_sucesso'] = 'Grupo excluído com sucesso!';
+                header("Location: grupos.php");
+                exit;
+            } catch (Exception $e) {
+                $db->rollBack();
+                throw new Exception("Erro ao excluir grupo: " . $e->getMessage());
+            }
+        } catch (Exception $e) {
+            $_SESSION['erro_exclusao'] = $e->getMessage();
+            header("Location: grupo.php?id=" . $grupo_id);
+            exit;
+        }
+    }
+}
+
 // Verificar se há mensagens de sucesso ou erro
 $contribuicao_sucesso = $_SESSION['contribuicao_sucesso'] ?? false;
 $erro_contribuicao = $_SESSION['erro_contribuicao'] ?? null;
+$config_sucesso = $_SESSION['config_sucesso'] ?? null;
+$erro_config = $_SESSION['erro_config'] ?? null;
+$erro_exclusao = $_SESSION['erro_exclusao'] ?? null;
+$atividade_sucesso = $_SESSION['atividade_sucesso'] ?? null;
+$erro_atividade = $_SESSION['erro_atividade'] ?? null;
 
 // Limpar mensagens da sessão
 unset($_SESSION['contribuicao_sucesso']);
 unset($_SESSION['erro_contribuicao']);
+unset($_SESSION['config_sucesso']);
+unset($_SESSION['erro_config']);
+unset($_SESSION['erro_exclusao']);
+unset($_SESSION['atividade_sucesso']);
+unset($_SESSION['erro_atividade']);
 
 // Função para buscar imagem do destino no JSON
 function buscarImagemDestino($destino)
@@ -268,7 +445,7 @@ try {
     // Buscar membros do grupo
     $stmt_membros = $db->prepare("
         SELECT u.id, u.nome, u.email, ug.data_entrada,
-               CASE WHEN u.id = g.criador_id THEN 'admin' ELSE 'membro' END as role
+               CASE WHEN u.id = g.criador_id THEN 'admin' ELSE 'membro' END as funcao
         FROM usuario_grupo ug
         INNER JOIN users u ON ug.usuario_id = u.id
         INNER JOIN grupos g ON ug.grupo_id = g.id
@@ -318,6 +495,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/grupo.css">
     <title><?= htmlspecialchars($grupo['nome_grupo']) ?> - Triply</title>
+    
 </head>
 
 <body>
@@ -339,7 +517,6 @@ try {
                 <a href="viagens.php">Viagens</a>
                 <a href="grupos.php">Grupos</a>
             </span>
-
         </div>
         <div class="nav-links" id="navLinks">
             <span class="nav-user-section">
@@ -368,21 +545,15 @@ try {
             <p class="group-subtitle">Próxima viagem: <?= date('d/m/Y', strtotime($grupo['data_inicio'])) ?> a <?= date('d/m/Y', strtotime($grupo['data_fim'])) ?></p>
             <div class="group-stats">
                 <div class="stat-item">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A2.01 2.01 0 0 0 18.06 7h-1.24c-.77 0-1.47.46-1.79 1.17L12.5 13H10v-2c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v2H2v6h6v-2h2v2h10zm-6-2H8v-4h2v4zm-7-9c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v3H7v-3z" />
-                    </svg>
+                    <img src="https://img.icons8.com/?size=100&id=11901&format=png&color=000000" alt="">
                     <span><?= count($membros) ?>/<?= $grupo['numero_maximo_membros'] ?> membros</span>
                 </div>
                 <div class="stat-item">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-2 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6-6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-12 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm12 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-6 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-6 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
-                    </svg>
+                    <img src="https://img.icons8.com/?size=100&id=67VRJ-68h0QI&format=png&color=000000" alt="">
                     <span>Meta: R$ <?= number_format($grupo['orcamento_total'], 2, ',', '.') ?></span>
                 </div>
                 <div class="stat-item">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
-                    </svg>
+                    <img src="https://img.icons8.com/?size=100&id=15685&format=png&color=000000" alt="">
                     <span><?= $dias_restantes ?> dias restantes</span>
                 </div>
             </div>
@@ -455,8 +626,8 @@ try {
                                 <div class="member-card">
                                     <img src="https://img.icons8.com/?size=100&id=fUUEbUbXhzOA&format=png&color=000000" alt="<?= htmlspecialchars($membro['nome']) ?>" class="member-avatar">
                                     <div class="member-name"><?= htmlspecialchars($membro['nome']) ?></div>
-                                    <div class="member-role <?= $membro['role'] === 'admin' ? 'admin' : '' ?>">
-                                        <?= $membro['role'] === 'admin' ? 'Administrador' : 'Membro' ?>
+                                    <div class="member-funcao <?= $membro['funcao'] === 'admin' ? 'admin' : '' ?>">
+                                        <?= $membro['funcao'] === 'admin' ? 'Administrador' : 'Membro' ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -578,10 +749,9 @@ try {
                     <div class="section">
                         <h2 class="section-title">Ações Rápidas</h2>
                         <div class="action-buttons">
-                            <button class="btn-large btn-primary" onclick="abrirModalContribuicao()">Adicionar ao Cofre</button>
                             <button class="btn-large btn-secondary" onclick="abrirModalAtividade()">Sugerir Atividade</button>
                             <button class="btn-large btn-outline" onclick="compartilharGrupo()">Compartilhar Grupo</button>
-                            <button class="btn-large btn-outline" onclick="abrirConfiguracoes()">Configurações</button>
+                            <button class="btn-large btn-outline" onclick="abrirConfiguracoes()">Editar</button>
                         </div>
                     </div>
                 </div>
@@ -637,6 +807,219 @@ try {
                 <button type="submit" class="btn-submit" id="btnSubmit">
                     Confirmar Contribuição
                 </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Sugerir Atividade -->
+    <div id="modalAtividade" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sugerir Atividade</h2>
+                <button class="close-modal" onclick="fecharModalAtividade()">&times;</button>
+            </div>
+
+            <form id="formAtividade" method="POST">
+                <input type="hidden" name="grupo_id" value="<?= $grupo_id ?>">
+                <input type="hidden" name="usuario_id" value="<?= $usuario_id ?>">
+                <input type="hidden" name="acao" value="sugerir_atividade">
+
+                <div class="form-group">
+                    <label for="descricao_atividade">Descreva sua sugestão de atividade *</label>
+                    <textarea id="descricao_atividade"
+                        name="descricao_atividade"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Ex: Vamos visitar o parque aquático no sábado pela manhã..."
+                        maxlength="500"
+                        required></textarea>
+                    <small class="char-count">0/500 caracteres</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="fecharModalAtividade()">Cancelar</button>
+                    <button type="submit" class="btn-submit" id="btnSubmitAtividade">
+                        Enviar Sugestão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações do Grupo -->
+    <div id="modalConfiguracoes" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Configurações do Grupo</h2>
+                <button class="close-modal" onclick="fecharModalConfiguracoes()">&times;</button>
+            </div>
+
+            <form id="formConfiguracoes" method="POST" class="config-form">
+                <input type="hidden" name="grupo_id" value="<?= $grupo_id ?>">
+                <input type="hidden" name="acao" value="atualizar_configuracoes">
+
+                <div class="config-sections">
+                    <!-- Informações Básicas -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">Informações Básicas</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nome_grupo">Nome do Grupo *</label>
+                                <input type="text"
+                                    id="nome_grupo"
+                                    name="nome_grupo"
+                                    class="form-control"
+                                    value="<?= htmlspecialchars($grupo['nome_grupo']) ?>"
+                                    maxlength="100"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="destino">Destino *</label>
+                                <input type="text"
+                                    id="destino"
+                                    name="destino"
+                                    class="form-control"
+                                    value="<?= htmlspecialchars($grupo['destino']) ?>"
+                                    maxlength="100"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descricao">Descrição do Grupo</label>
+                            <textarea id="descricao"
+                                name="descricao"
+                                class="form-control"
+                                rows="3"
+                                maxlength="500"
+                                placeholder="Descreva o propósito deste grupo..."><?= htmlspecialchars($grupo['descricao'] ?? '') ?></textarea>
+                            <small class="char-count"><?= strlen($grupo['descricao'] ?? '') ?>/500 caracteres</small>
+                        </div>
+                    </div>
+
+                    <!-- Datas da Viagem -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">Datas da Viagem</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="data_inicio">Data de Início *</label>
+                                <input type="date"
+                                    id="data_inicio"
+                                    name="data_inicio"
+                                    class="form-control"
+                                    value="<?= $grupo['data_inicio'] ?>"
+                                    min="<?= date('Y-m-d') ?>"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data_fim">Data de Término *</label>
+                                <input type="date"
+                                    id="data_fim"
+                                    name="data_fim"
+                                    class="form-control"
+                                    value="<?= $grupo['data_fim'] ?>"
+                                    min="<?= $grupo['data_inicio'] ?>"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configurações Financeiras -->
+                    <div class="config-section">
+                        <h3 class="config-section-title">Configurações Financeiras</h3>
+
+                        <div class="form-group">
+                            <label for="orcamento_total">Orçamento Total (R$) *</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">R$</span>
+                                <input type="number"
+                                    id="orcamento_total"
+                                    name="orcamento_total"
+                                    class="form-control"
+                                    value="<?= $grupo['orcamento_total'] ?>"
+                                    min="1"
+                                    max="1000000"
+                                    step="0.01"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="numero_maximo_membros">Número Máximo de Membros *</label>
+                            <select id="numero_maximo_membros" name="numero_maximo_membros" class="form-control" required>
+                                <?php for ($i = 2; $i <= 20; $i++): ?>
+                                    <option value="<?= $i ?>" <?= $grupo['numero_maximo_membros'] == $i ? 'selected' : '' ?>>
+                                        <?= $i ?> membros
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                            <small style="color: #666;">
+                                Atualmente: <?= count($membros) ?> membros de <?= $grupo['numero_maximo_membros'] ?> possíveis
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Ações do Grupo -->
+<div class="form-actions">
+    <div class="btn-actions">
+        <button type="submit" class="btn-submit" id="btnSubmitConfig">
+            <span class="btn-icon">💾</span>
+            Salvar Alterações
+        </button>
+    </div>
+    <button type="button" class="btn-delete" onclick="abrirModalExcluirGrupo()">
+        <span class="btn-icon">🗑️</span>
+        Excluir Grupo
+    </button>
+</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Excluir Grupo -->
+    <div id="modalExcluirGrupo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Excluir Grupo</h2>
+                <button class="close-modal" onclick="fecharModalExcluirGrupo()">&times;</button>
+            </div>
+
+            <form id="formExcluirGrupo" method="POST">
+                <input type="hidden" name="grupo_id" value="<?= $grupo_id ?>">
+                <input type="hidden" name="acao" value="excluir_grupo">
+
+                <div class="warning-message danger">
+                    <strong>⚠️ ATENÇÃO: Esta ação não pode ser desfeita!</strong>
+                    <p>Todos os dados serão permanentemente excluídos:</p>
+                    <ul>
+                        <li>Informações do grupo</li>
+                        <li>Histórico de contribuições</li>
+                        <li>Atividades planejadas</li>
+                        <li>Mensagens e conversas</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmacao">Digite "EXCLUIR" para confirmar:</label>
+                    <input type="text"
+                        id="confirmacao"
+                        name="confirmacao"
+                        class="form-control"
+                        placeholder="EXCLUIR"
+                        required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="fecharModalExcluirGrupo()">Cancelar</button>
+                    <button type="submit" class="btn-danger" id="btnSubmitExcluir" disabled>
+                        Excluir Grupo Permanentemente
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -769,6 +1152,7 @@ try {
                 document.body.style.overflow = '';
             }
         });
+
         // Funções do Modal de Contribuição
         function abrirModalContribuicao() {
             const modal = document.getElementById('modalContribuicao');
@@ -786,15 +1170,74 @@ try {
             document.body.style.overflow = 'auto';
         }
 
-        // Fechar modal ao clicar fora
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalContribuicao');
-            if (event.target === modal) {
-                fecharModalContribuicao();
-            }
+        // Funções do Modal de Atividade
+        function abrirModalAtividade() {
+            const modal = document.getElementById('modalAtividade');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+
+            // Resetar formulário
+            document.getElementById('formAtividade').reset();
+            document.querySelector('#modalAtividade .char-count').textContent = '0/500 caracteres';
+            document.querySelector('#modalAtividade .char-count').style.color = '#666';
         }
 
-        // Validação do formulário
+        function fecharModalAtividade() {
+            const modal = document.getElementById('modalAtividade');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Funções do Modal de Configurações
+        function abrirConfiguracoes() {
+            const modal = document.getElementById('modalConfiguracoes');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+
+            // Atualizar data mínima para data fim
+            const dataInicio = document.getElementById('data_inicio');
+            const dataFim = document.getElementById('data_fim');
+            dataFim.min = dataInicio.value;
+        }
+
+        function fecharModalConfiguracoes() {
+            const modal = document.getElementById('modalConfiguracoes');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function abrirModalExcluirGrupo() {
+            fecharModalConfiguracoes();
+            const modal = document.getElementById('modalExcluirGrupo');
+            modal.style.display = 'block';
+        }
+
+        function fecharModalExcluirGrupo() {
+            const modal = document.getElementById('modalExcluirGrupo');
+            modal.style.display = 'none';
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            const modals = ['modalContribuicao', 'modalAtividade', 'modalConfiguracoes', 'modalExcluirGrupo'];
+
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    if (modalId === 'modalContribuicao') {
+                        fecharModalContribuicao();
+                    } else if (modalId === 'modalAtividade') {
+                        fecharModalAtividade();
+                    } else if (modalId === 'modalConfiguracoes') {
+                        fecharModalConfiguracoes();
+                    } else if (modalId === 'modalExcluirGrupo') {
+                        fecharModalExcluirGrupo();
+                    }
+                }
+            });
+        }
+
+        // Validação do formulário de contribuição
         document.getElementById('formContribuicao').addEventListener('submit', function(e) {
             const valor = parseFloat(document.getElementById('valor').value);
             const btnSubmit = document.getElementById('btnSubmit');
@@ -809,6 +1252,102 @@ try {
             btnSubmit.disabled = true;
             btnSubmit.textContent = 'Processando...';
             btnSubmit.classList.add('loading');
+        });
+
+        // Validação do formulário de atividade
+        document.getElementById('formAtividade').addEventListener('submit', function(e) {
+            const descricao = document.getElementById('descricao_atividade').value.trim();
+            const btnSubmit = document.getElementById('btnSubmitAtividade');
+
+            if (!descricao) {
+                e.preventDefault();
+                alert('Por favor, descreva sua sugestão de atividade.');
+                return;
+            }
+
+            // Mostrar loading
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Enviando...';
+            btnSubmit.classList.add('loading');
+        });
+
+        // Validação do formulário de configurações
+        document.getElementById('formConfiguracoes').addEventListener('submit', function(e) {
+            const btnSubmit = document.getElementById('btnSubmitConfig');
+            const dataInicio = new Date(document.getElementById('data_inicio').value);
+            const dataFim = new Date(document.getElementById('data_fim').value);
+            const hoje = new Date();
+
+            // Validar datas
+            if (dataInicio < hoje) {
+                e.preventDefault();
+                alert('A data de início não pode ser no passado!');
+                return;
+            }
+
+            if (dataFim <= dataInicio) {
+                e.preventDefault();
+                alert('A data de término deve ser posterior à data de início!');
+                return;
+            }
+
+            // Mostrar loading
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Salvando...';
+            btnSubmit.classList.add('loading');
+        });
+
+        // Validação do formulário de exclusão
+        document.getElementById('formExcluirGrupo').addEventListener('submit', function(e) {
+            if (!confirm('CONFIRMAÇÃO FINAL: Tem certeza absoluta que deseja excluir este grupo permanentemente?')) {
+                e.preventDefault();
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmitExcluir');
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Excluindo...';
+            btnSubmit.classList.add('loading');
+        });
+
+        // Validação de confirmação para excluir grupo
+        document.getElementById('confirmacao').addEventListener('input', function(e) {
+            const btnExcluir = document.getElementById('btnSubmitExcluir');
+            btnExcluir.disabled = e.target.value.toUpperCase() !== 'EXCLUIR';
+        });
+
+        // Contador de caracteres da descrição
+        document.getElementById('descricao').addEventListener('input', function(e) {
+            const charCount = document.querySelector('#modalConfiguracoes .char-count');
+            charCount.textContent = `${e.target.value.length}/500 caracteres`;
+
+            if (e.target.value.length > 500) {
+                charCount.style.color = '#dc3545';
+            } else {
+                charCount.style.color = '#666';
+            }
+        });
+
+        // Contador de caracteres da atividade
+        document.getElementById('descricao_atividade').addEventListener('input', function(e) {
+            const charCount = document.querySelector('#modalAtividade .char-count');
+            charCount.textContent = `${e.target.value.length}/500 caracteres`;
+
+            if (e.target.value.length > 500) {
+                charCount.style.color = '#dc3545';
+            } else {
+                charCount.style.color = '#666';
+            }
+        });
+
+        // Validação de datas
+        document.getElementById('data_inicio').addEventListener('change', function() {
+            const dataFim = document.getElementById('data_fim');
+            dataFim.min = this.value;
+
+            if (dataFim.value && dataFim.value < this.value) {
+                dataFim.value = this.value;
+            }
         });
 
         // Formatação do valor em tempo real
@@ -827,59 +1366,39 @@ try {
             alert('Funcionalidade de convite será implementada em breve!');
         }
 
-        function abrirModalAtividade() {
-            alert('Funcionalidade de atividade será implementada em breve!');
-        }
-
         function compartilharGrupo() {
-            const codigo = '<?= $grupo['codigo'] ?? "GRUPO-" . $grupo_id ?>';
-            if (navigator.share) {
-                navigator.share({
-                    title: '<?= htmlspecialchars($grupo['nome_grupo']) ?>',
-                    text: 'Junte-se ao meu grupo de viagem no Triply! Código: ' + codigo,
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(codigo).then(() => {
-                    alert('Código do grupo copiado: ' + codigo);
-                });
-            }
-        }
+    const codigo = '<?= $grupo['codigo'] ?? "GRUPO-" . $grupo_id ?>';
+    const nomeGrupo = '<?= htmlspecialchars($grupo['nome_grupo']) ?>';
+    const destino = '<?= htmlspecialchars($grupo['destino']) ?>';
+    const dataInicio = '<?= date('d/m/Y', strtotime($grupo['data_inicio'])) ?>';
+    const dataFim = '<?= date('d/m/Y', strtotime($grupo['data_fim'])) ?>';
+    
+    const mensagem = `🎉 Olá! 
 
-        function abrirConfiguracoes() {
-            alert('Configurações do grupo serão implementadas em breve!');
-        }
+Estou te convidando para se juntar ao nosso grupo de viagem "${nomeGrupo}" no Triply!
 
-        // Dropdown functionality
-        function toggleDropdown() {
-            const dropdown = document.querySelector('.user-dropdown');
-            dropdown.classList.toggle('active');
+📍 Destino: ${destino}
+📅 Datas: ${dataInicio} a ${dataFim}
 
-            if (dropdown.classList.contains('active')) {
-                const overlay = document.createElement('div');
-                overlay.className = 'dropdown-overlay';
-                overlay.onclick = closeDropdown;
-                document.body.appendChild(overlay);
-            } else {
-                closeDropdown();
-            }
-        }
+Para entrar no grupo, use o código: ${codigo}
 
-        function closeDropdown() {
-            const dropdown = document.querySelector('.user-dropdown');
-            dropdown.classList.remove('active');
+Ou acesse diretamente:
+http://localhost:3000/pages/grupos.php
 
-            const overlay = document.querySelector('.dropdown-overlay');
-            if (overlay) {
-                overlay.remove();
-            }
-        }
+Mal posso esperar para viajar com você! ✈️`;
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDropdown();
-            }
+    if (navigator.share) {
+        navigator.share({
+            title: 'Junte-se ao meu grupo de viagem no Triply!',
+            text: mensagem,
+            url: 'http://localhost:3000/pages/grupos.php'
         });
+    } else {
+        navigator.clipboard.writeText(mensagem).then(() => {
+            alert('Convite copiado! Cole e envie para seus amigos. 📋\n\n' + mensagem);
+        });
+    }
+}
 
         // Atualizar progresso
         document.addEventListener('DOMContentLoaded', function() {
@@ -895,55 +1414,68 @@ try {
             updateProgress(<?= $total_arrecadado ?>, <?= $grupo['orcamento_total'] ?>);
         });
 
-        // Mostrar mensagem de sucesso se houver
-        <?php if ($contribuicao_sucesso): ?>
-            document.addEventListener('DOMContentLoaded', function() {
-                const successMessage = document.createElement('div');
-                successMessage.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #d4edda;
-                color: #155724;
-                padding: 15px 20px;
-                border-radius: 8px;
-                border: 1px solid #c3e6cb;
-                z-index: 1001;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            `;
-                successMessage.textContent = '✅ Contribuição realizada com sucesso!';
-                document.body.appendChild(successMessage);
+        // Mostrar mensagens de sucesso/erro
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mensagem de contribuição
+            <?php if ($contribuicao_sucesso): ?>
+                mostrarMensagem('✅ Contribuição realizada com sucesso!', 'success');
+            <?php endif; ?>
 
-                setTimeout(() => {
-                    successMessage.remove();
-                }, 5000);
-            });
-        <?php endif; ?>
+            <?php if ($erro_contribuicao): ?>
+                mostrarMensagem('❌ <?= addslashes($erro_contribuicao) ?>', 'error');
+            <?php endif; ?>
 
-        // Mostrar mensagem de erro se houver
-        <?php if ($erro_contribuicao): ?>
-            document.addEventListener('DOMContentLoaded', function() {
-                const errorMessage = document.createElement('div');
-                errorMessage.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #f8d7da;
-                color: #721c24;
-                padding: 15px 20px;
-                border-radius: 8px;
-                border: 1px solid #f5c6cb;
-                z-index: 1001;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            `;
-                errorMessage.textContent = '❌ <?= addslashes($erro_contribuicao) ?>';
-                document.body.appendChild(errorMessage);
+            <?php if ($config_sucesso): ?>
+                mostrarMensagem('✅ <?= addslashes($config_sucesso) ?>', 'success');
+            <?php endif; ?>
 
-                setTimeout(() => {
-                    errorMessage.remove();
-                }, 5000);
-            });
-        <?php endif; ?>
+            <?php if ($erro_config): ?>
+                mostrarMensagem('❌ <?= addslashes($erro_config) ?>', 'error');
+            <?php endif; ?>
+
+            <?php if ($erro_exclusao): ?>
+                mostrarMensagem('❌ <?= addslashes($erro_exclusao) ?>', 'error');
+            <?php endif; ?>
+
+            <?php if ($atividade_sucesso): ?>
+                mostrarMensagem('✅ <?= addslashes($atividade_sucesso) ?>', 'success');
+            <?php endif; ?>
+
+            <?php if ($erro_atividade): ?>
+                mostrarMensagem('❌ <?= addslashes($erro_atividade) ?>', 'error');
+            <?php endif; ?>
+        });
+
+        function mostrarMensagem(texto, tipo) {
+            const message = document.createElement('div');
+            message.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-weight: 600;
+        `;
+
+            if (tipo === 'success') {
+                message.style.background = '#d4edda';
+                message.style.color = '#155724';
+                message.style.border = '1px solid #c3e6cb';
+            } else {
+                message.style.background = '#f8d7da';
+                message.style.color = '#721c24';
+                message.style.border = '1px solid #f5c6cb';
+            }
+
+            message.textContent = texto;
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.remove();
+            }, 5000);
+        }
     </script>
 </body>
 

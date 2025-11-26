@@ -189,42 +189,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="nome">Nome</label>
                         <input type="text" id="nome" name="nome" required>
+                        <span class="error-msg"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="sobrenome">Sobrenome</label>
                         <input type="text" id="sobrenome" name="sobrenome" required>
+                        <span class="error-msg"></span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf" required maxlength="14">
+                    <span class="error-msg"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="date">Data de Nascimento</label>
                     <input type="date" id="date" name="date" required>
+                    <span class="error-msg"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
+                    <span class="error-msg"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="telefone">Telefone</label>
                     <input type="tel" id="telefone" name="telefone" required maxlength="15">
+                    <span class="error-msg"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="senha">Senha</label>
                     <input type="password" id="senha" name="senha" required minlength="6">
+                    <span class="error-msg"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="confirmar-senha">Confirmar Senha</label>
                     <input type="password" id="confirmar-senha" name="confirmar-senha" required>
+                    <span class="error-msg"></span>
                 </div>
 
                 <button type="submit" class="btn-submit">Criar Conta</button>
@@ -290,31 +298,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             e.target.value = v;
         });
 
+        function validarIdade(dataNascimento) {
+            if (!dataNascimento) return false;
+
+            const hoje = new Date();
+            const nasc = new Date(dataNascimento);
+
+            let idade = hoje.getFullYear() - nasc.getFullYear();
+            const mes = hoje.getMonth() - nasc.getMonth();
+
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nasc.getDate())) {
+                idade--;
+            }
+
+            return idade >= 16 && idade < 100;
+        }
+
+        function validarSenhas(s1, s2) {
+            return s1 === s2;
+        }
         // ============ SUBMIT FINAL ============
         document.getElementById('registerForm').addEventListener('submit', function(e) {
+
+            let hasError = false;
 
             const email = document.getElementById('email').value;
             const telefone = document.getElementById('telefone').value;
             const cpf = document.getElementById('cpf').value;
+            const nascimento = document.getElementById('date').value;
+            const senha = document.getElementById('senha').value;
+            const confirmar = document.getElementById('confirmar-senha').value;
+
+            // Limpa erros antes de validar
+            ['email', 'telefone', 'cpf', 'date', 'senha', 'confirmar-senha'].forEach(clearError);
 
             if (!validarEmail(email)) {
-                alert("Email inválido!.");
-                e.preventDefault();
-                return;
+                setError('email', "Informe um email válido.");
+                hasError = true;
             }
 
             if (!validarTelefone(telefone)) {
-                alert("Telefone inválido!.");
-                e.preventDefault();
-                return;
+                setError('telefone', "Telefone inválido.");
+                hasError = true;
             }
 
             if (!validarCPF(cpf)) {
-                alert("CPF inválido!");
+                setError('cpf', "CPF inválido.");
+                hasError = true;
+            }
+
+            if (!validarIdade(nascimento)) {
+                setError('date', "Idade inválida.");
+                hasError = true;
+            }
+
+            if (!validarSenhas(senha, confirmar)) {
+                setError('senha', "As senhas devem ser iguais.");
+                setError('confirmar-senha', "As senhas não coincidem.");
+                hasError = true;
+            }
+
+            if (hasError) {
                 e.preventDefault();
                 return;
             }
         });
+
+        function setError(campoId, mensagem) {
+            const campo = document.getElementById(campoId);
+            const errorSpan = campo.parentElement.querySelector('.error-msg');
+
+            campo.classList.add('input-error');
+            errorSpan.textContent = mensagem;
+            errorSpan.classList.add('show');
+        }
+
+        function clearError(campoId) {
+            const campo = document.getElementById(campoId);
+            const errorSpan = campo.parentElement.querySelector('.error-msg');
+
+            campo.classList.remove('input-error');
+            errorSpan.textContent = "";
+            errorSpan.classList.remove('show');
+        }
     </script>
 
 </body>

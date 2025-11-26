@@ -202,6 +202,22 @@ a{
 .form-group.success input {
   border-color: #10B981;
 }
+.input-error {
+    border: 2px solid #e63946 !important;
+    background-color: #ffe5e5;
+}
+
+.error-msg {
+    color: #e63946;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: none;
+}
+
+.error-msg.show {
+    display: block;
+}
+
 
 @media (max-width: 968px) {
   .card {
